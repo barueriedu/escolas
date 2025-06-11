@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Localização da Escola</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    #map {
+      height: calc(100vh - 120px);
+      width: 100%;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1e40af 0%, #a3cbf9 100%);
+      padding: 1.5rem;
+      color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .back-button {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      color: white;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .school-name {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+      margin: 0;
+      padding: 0.5rem 0;
+    }
+
+    .school-type {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+      margin: 0;
+      padding: 0.5rem 0;
+      margin-right: 0.5rem;
+    }
+
+    .school-info {
+      text-align: left;
+      flex: 1;
+      margin-left: 2rem;
+    }
+
+    .map-container {
+      padding: 1.5rem;
+      background: #f8fafc;
+    }
+
+    .error-message {
+      text-align: center;
+      padding: 2rem;
+      color: #ef4444;
+      font-size: 1.2rem;
+    }
+
+    .error-message a {
+      color: #3b82f6;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  <header class="header">
+    <div class="header-content">
+      <a href="index.html" class="back-button">
+        <i class="fas fa-arrow-left mr-2"></i>Voltar
+      </a>
+      <div class="school-info">
+        <div class="flex items-center">
+          <span class="school-type" id="schoolType"></span>
+          <h1 class="school-name" id="schoolName"></h1>
+        </div>
+        <p class="text-sm text-gray-200 mt-1" id="schoolAddress"></p>
+      </div>
+      <div style="width: 100px;"></div> <!-- Espaçador para manter o título centralizado -->
+    </div>
+  </header>
+
+  <main class="map-container">
+    <div id="map"></div>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="escolas.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const schoolName = decodeURIComponent(urlParams.get('name'));
+      console.log('Looking for school:', schoolName);
+      const school = schools.find(s => s.name === schoolName);
+      console.log('Found school:', school);
+
+      document.getElementById('schoolName').textContent = schoolName;
+      if (school) {
+        document.getElementById('schoolType').textContent = school.type;
+        document.getElementById('schoolAddress').textContent = `${school.address}, ${school.neighborhood}`;
+      }
+
+      if (school && school.latitude && school.longitude) {
+        console.log('Using coordinates:', school.latitude, school.longitude);
+        const map = L.map('map').setView([school.latitude, school.longitude], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        const marker = L.marker([school.latitude, school.longitude]).addTo(map);
+        let popupContent = `
+          <strong>${school.name}</strong><br>
+          ${school.address}<br>
+          ${school.neighborhood}
+        `;
+        if (school.phones && school.phones.length > 0) {
+          popupContent += `<br>Telefones: ${school.phones.join(', ')}`;
+        }
+        marker.bindPopup(popupContent);
+      } else {
+        console.log('No coordinates found for school');
+        document.getElementById('map').innerHTML = `
+          <div class="error-message">
+            <p>Localização não disponível</p>
+            <p>Não foi possível encontrar as coordenadas para esta escola.</p>
+            <a href="index.html">Voltar para a página inicial</a>
+          </div>
+        `;
+      }
+    });
+  </script>
+</body>
+
+</html>
