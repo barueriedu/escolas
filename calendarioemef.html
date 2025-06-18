@@ -36,7 +36,7 @@
     }
 
     .event-avaliacao {
-      background-color:  #7955FA;
+      background-color: #7955FA;
     }
 
     .event-outro {
@@ -51,6 +51,26 @@
 
     .janeiro-ferias {
       background-color: #ff7878 !important;
+    }
+
+    /* Ajustes para 4 meses por linha */
+    @media (min-width: 1280px) {
+      #calendarContainer {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    /* Reduzir tamanho dos campos dos dias */
+    .calendar-month .grid>div {
+      min-height: 35px !important;
+      padding: 4px !important;
+      font-size: 0.75rem !important;
+    }
+
+    .calendar-month .grid>div:first-child {
+      font-size: 0.7rem !important;
+      font-weight: bold;
+      padding: 2px !important;
     }
   </style>
 </head>
@@ -104,7 +124,7 @@
     </div>
     <!-- Calendário -->
     <div class="bg-white rounded-lg shadow-md p-4">
-      <div id="calendarContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div id="calendarContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <!-- Os meses serão inseridos via JS -->
       </div>
     </div>
