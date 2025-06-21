@@ -92,40 +92,30 @@
 
   <!-- Main Content -->
   <main class="container mx-auto px-4 py-8 main-content">
-    <!-- Legenda -->
-    <div class="mb-6 bg-white p-4 rounded-lg shadow-md">
-      <h2 class="text-xl font-semibold mb-4">Legenda</h2>
-      <div class="flex flex-wrap gap-4 text-sm items-center">
-        <div class="flex items-center whitespace-nowrap">
-          <div class="w-4 h-4 bg-blue-300 mr-2 border"></div> Dias Letivos
-        </div>
-        <div class="flex items-center whitespace-nowrap">
-          <div class="w-4 h-4 bg-white border mr-2"></div> Início das Aulas (10/02)
-        </div>
-        <div class="flex items-center whitespace-nowrap">
-          <div class="w-4 h-4 bg-red-700 mr-2 border"></div> Feriados / Ponto Facult./Recesso do Prof.
-        </div>
-        <div class="flex items-center whitespace-nowrap">
-          <div class="w-4 h-4 bg-gray-400 mr-2 border"></div> Dia sem Expediente
-        </div>
-        <div class="flex items-center whitespace-nowrap">
-          <div class="w-4 h-4 bg-yellow-200 mr-2 border"></div> Dia com expediente, sem professor
-        </div>
-        <div class="flex items-center whitespace-nowrap">
-          <div class="w-4 h-4 mr-2 border" style="background-color:#FFD700;"></div> Semana Pedagógica/Planejamento Anual
-        </div>
-        <div class="flex items-center whitespace-nowrap">
-          <div class="w-4 h-4 bg-pink-400 mr-2 border"></div> Evento: Festa Junina/Reunião de Pais/Fechamento Doc. Pedagógica
-        </div>
-        <div class="flex items-center whitespace-nowrap">
-          <div class="w-4 h-4" style="background-color:#ff7878; border:1px solid #ccc; margin-right:0.5rem;"></div> Férias escolares
-        </div>
-      </div>
-    </div>
     <!-- Calendário -->
     <div class="bg-white rounded-lg shadow-md p-4">
       <div id="calendarContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <!-- Os meses serão inseridos via JS -->
+      </div>
+    </div>
+    <!-- Toggleable Legend Below Calendar -->
+    <div class="flex flex-col items-center mt-6">
+      <button id="toggleLegendBtn" class="text-blue-700 font-semibold text-lg flex items-center gap-2 focus:outline-none">
+        Legenda <span id="legendArrow">^</span>
+      </button>
+      <div id="legendContainer" class="legend-container mt-2 hidden transition-all duration-200">
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #ff0000"></div><span>Feriados e Fins de Semana</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #f5adad"></div><span>Férias Escolares</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #FFD700"></div><span>Reunião Pedagógica</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #7955fa"></div><span>Sábado Letivo/Reunião de Pais</span>
+        </div>
       </div>
     </div>
   </main>
@@ -160,6 +150,18 @@
   </footer>
 
   <script src="calendarioemef.js"></script>
+  <script>
+    // Toggle legend show/hide
+    const toggleBtn = document.getElementById('toggleLegendBtn');
+    const legendContainer = document.getElementById('legendContainer');
+    const legendArrow = document.getElementById('legendArrow');
+    let legendVisible = false;
+    toggleBtn.addEventListener('click', () => {
+      legendVisible = !legendVisible;
+      legendContainer.classList.toggle('hidden', !legendVisible);
+      legendArrow.textContent = legendVisible ? 'v' : '^';
+    });
+  </script>
 </body>
 
 </html>

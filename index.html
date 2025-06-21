@@ -38,6 +38,17 @@
             <i class="fas fa-search"></i>
           </button>
         </div>
+        <!-- Menu Hambúrguer -->
+        <div class="ml-4 relative">
+          <button id="menuBtn" class="flex flex-col justify-center items-center w-10 h-10 rounded hover:bg-blue-600 focus:outline-none">
+            <span class="block w-6 h-0.5 bg-white mb-1"></span>
+            <span class="block w-6 h-0.5 bg-white mb-1"></span>
+            <span class="block w-6 h-0.5 bg-white"></span>
+          </button>
+          <div id="menuDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded shadow-lg z-50">
+            <a href="calendarioemef.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário EMEF</a>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -153,6 +164,20 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="escolas.js"></script>
   <script src="script.js"></script>
+  <script>
+    // Menu hambúrguer toggle
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+    document.addEventListener('click', function (e) {
+      if (menuBtn && menuDropdown) {
+        if (menuBtn.contains(e.target)) {
+          menuDropdown.classList.toggle('hidden');
+        } else if (!menuDropdown.contains(e.target)) {
+          menuDropdown.classList.add('hidden');
+        }
+      }
+    });
+  </script>
 </body>
 
 </html>
