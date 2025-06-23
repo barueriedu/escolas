@@ -113,7 +113,10 @@ const calendarData = {
         { date: 23, events: [] },
         { date: 24, events: [] },
         { date: 25, events: [] },
-        { date: 26, events: [{ type: "feriado", text: "Feriado/Emancipação Barueri"}] },
+        {
+          date: 26,
+          events: [{ type: "feriado", text: "Feriado/Emancipação Barueri" }],
+        },
         { date: 27, events: [] },
         { date: 28, events: [] },
         { date: 29, events: [] },
@@ -160,14 +163,17 @@ const calendarData = {
       name: "Maio",
       days: [
         { date: 1, events: [{ type: "feriado", text: "Dia do Trabalho" }] },
-        { date: 2, events: [] },
+        {
+          date: 2,
+          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+        },
         { date: 3, events: [] },
         { date: 4, events: [] },
         { date: 5, events: [] },
         { date: 6, events: [] },
         { date: 7, events: [] },
-        { date: 8, events: [] },
-        { date: 9, events: [] },
+        { date: 8, events: [{ type: "evento", text: "Conselho de Classe" }] },
+        { date: 9, events: [{ type: "evento", text: "Conselho de Classe" }] },
         { date: 10, events: [] },
         { date: 11, events: [] },
         { date: 12, events: [] },
@@ -208,21 +214,27 @@ const calendarData = {
         { date: 11, events: [] },
         { date: 12, events: [] },
         { date: 13, events: [] },
-        { date: 14, events: [] },
+        { date: 14, events: [{ type: "evento", text: "Festa Junina" }] },
         { date: 15, events: [] },
         { date: 16, events: [] },
         { date: 17, events: [] },
         { date: 18, events: [] },
         { date: 19, events: [{ type: "feriado", text: "Corpus Christi" }] },
-        { date: 20, events: [] },
+        {
+          date: 20,
+          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+        },
         { date: 21, events: [] },
         { date: 22, events: [] },
-        { date: 23, events: [] },
+        {
+          date: 23,
+          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+        },
         { date: 24, events: [] },
         { date: 25, events: [] },
-        { date: 26, events: [] },
-        { date: 27, events: [] },
-        { date: 28, events: [{ type: "evento", text: "Festa Junina" }] },
+        { date: 26, events: [{ type: "evento", text: "Conselho de Classe" }] },
+        { date: 27, events: [{ type: "evento", text: "Conselho de Classe" }] },
+        { date: 28, events: [] },
         { date: 29, events: [] },
         { date: 30, events: [] },
       ],
@@ -326,8 +338,8 @@ const calendarData = {
         { date: 22, events: [] },
         { date: 23, events: [] },
         { date: 24, events: [] },
-        { date: 25, events: [] },
-        { date: 26, events: [] },
+        { date: 25, events: [{ type: "evento", text: "Conselho de Classe" }] },
+        { date: 26, events: [{ type: "evento", text: "Conselho de Classe" }] },
         { date: 27, events: [] },
         { date: 28, events: [] },
         { date: 29, events: [] },
@@ -363,7 +375,10 @@ const calendarData = {
         { date: 24, events: [] },
         { date: 25, events: [] },
         { date: 26, events: [] },
-        { date: 27, events: [] },
+        {
+          date: 27,
+          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+        },
         { date: 28, events: [] },
         { date: 29, events: [] },
         { date: 30, events: [] },
@@ -411,8 +426,8 @@ const calendarData = {
         { date: 1, events: [] },
         { date: 2, events: [] },
         { date: 3, events: [] },
-        { date: 4, events: [] },
-        { date: 5, events: [] },
+        { date: 4, events: [{ type: "evento", text: "Conselho de Classe" }] },
+        { date: 5, events: [{ type: "evento", text: "Conselho de Classe" }] },
         { date: 6, events: [] },
         { date: 7, events: [] },
         { date: 8, events: [] },
@@ -431,14 +446,23 @@ const calendarData = {
         { date: 21, events: [] },
         { date: 22, events: [] },
         { date: 23, events: [] },
-        { date: 24, events: [] },
+        {
+          date: 24,
+          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+        },
         { date: 25, events: [] },
-        { date: 26, events: [] },
+        {
+          date: 26,
+          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+        },
         { date: 27, events: [] },
         { date: 28, events: [] },
         { date: 29, events: [] },
         { date: 30, events: [] },
-        { date: 31, events: [] },
+        {
+          date: 31,
+          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+        },
       ],
     },
   ],
@@ -486,8 +510,23 @@ function createMonthCalendar(monthData, monthIndex) {
     const date = new Date(2025, monthIndex, day.date);
     const weekDay = date.getDay();
 
+    // Dias de Conselho de Classe
+    if (
+      (monthData.name === "Maio" && (day.date === 8 || day.date === 9)) ||
+      (monthData.name === "Junho" && (day.date === 26 || day.date === 27)) ||
+      (monthData.name === "Setembro" && (day.date === 25 || day.date === 26)) ||
+      (monthData.name === "Dezembro" && (day.date === 4 || day.date === 5))
+    ) {
+      dayDiv.style.backgroundColor = "#8ff5aa";
+      dayDiv.title = "Conselho de Classe";
+    }
+    // Dia 02 de maio: dia sem expediente
+    else if (monthData.name === "Maio" && day.date === 2) {
+      dayDiv.style.backgroundColor = "#ff00ff";
+      dayDiv.title = "Dia sem expediente";
+    }
     // Aplicar cores baseadas nos eventos
-    if (day.events.length > 0) {
+    else if (day.events.length > 0) {
       const event = day.events[0];
 
       switch (event.type) {
@@ -510,12 +549,18 @@ function createMonthCalendar(monthData, monthIndex) {
           dayDiv.style.border = "2px solid #000";
           break;
         case "evento":
-          dayDiv.style.backgroundColor = "#ff69b4";
+          dayDiv.style.backgroundColor = "#edf574";
+          break;
+        case "Dia sem Expediente":
+          dayDiv.style.backgroundColor = "#ff00ff";
+          dayDiv.title = "Dia sem expediente";
           break;
         default:
           // Dias letivos normais
           dayDiv.style.backgroundColor = "#87CEEB";
       }
+      // Adicionar tooltip com informações do evento
+      dayDiv.title = event.text;
     } else {
       // Sábados e domingos
       if (weekDay === 0 || weekDay === 6) {
@@ -525,11 +570,6 @@ function createMonthCalendar(monthData, monthIndex) {
         // Dias letivos normais
         dayDiv.style.backgroundColor = "#87CEEB";
       }
-    }
-
-    // Adicionar tooltip com informações do evento
-    if (day.events.length > 0) {
-      dayDiv.title = day.events[0].text;
     }
 
     daysGrid.appendChild(dayDiv);
