@@ -19,7 +19,7 @@
     }
 
     .calendar-month.selected {
-      box-shadow: 0 0 0 3px #2563eb, 0 1px 3px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 0 3px #bbb, 0 0 16px 4px rgba(100, 100, 100, 0.18);
       opacity: 1;
       filter: none;
       z-index: 10;
@@ -135,7 +135,7 @@
 
     /* Reduzir tamanho dos campos dos dias */
     .calendar-month .grid>div {
-      min-height: 35px !important;
+      min-height: 1.7rem !important;
       padding: 4px !important;
       font-size: 0.75rem !important;
     }
@@ -172,6 +172,11 @@
       word-break: keep-all;
       white-space: nowrap;
     }
+
+    /* Reduzir espaço entre nome do mês e os dias para Maio-Dezembro */
+    .calendar-month:nth-child(n+5) h3 {
+      margin-bottom: 0.2rem !important;
+    }
   </style>
 </head>
 
@@ -192,9 +197,16 @@
 
   <!-- Main Content -->
   <main class="container mx-auto px-4 py-8 main-content">
+    <!-- Linha de seleção dos bimestres -->
+    <div id="bimestreSelector" class="flex justify-center gap-4 mb-4 mt-2">
+      <button class="bimestre-btn px-3 py-1 rounded bg-gray-200 hover:bg-blue-200 font-semibold text-sm" data-bimestre="1">1º Bimestre</button>
+      <button class="bimestre-btn px-3 py-1 rounded bg-gray-200 hover:bg-blue-200 font-semibold text-sm" data-bimestre="2">2º Bimestre</button>
+      <button class="bimestre-btn px-3 py-1 rounded bg-gray-200 hover:bg-blue-200 font-semibold text-sm" data-bimestre="3">3º Bimestre</button>
+      <button class="bimestre-btn px-3 py-1 rounded bg-gray-200 hover:bg-blue-200 font-semibold text-sm" data-bimestre="4">4º Bimestre</button>
+    </div>
     <!-- Calendário -->
     <div class="bg-white rounded-lg shadow-md p-4">
-      <div id="calendarContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+      <div id="calendarContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 relative">
         <!-- Os meses serão inseridos via JS -->
       </div>
     </div>
@@ -266,6 +278,127 @@
       legendVisible = !legendVisible;
       legendContainer.classList.toggle('hidden', !legendVisible);
       legendArrow.textContent = legendVisible ? 'v' : '^';
+    });
+
+    // --- Bimestre Highlight ---
+    const bimestreRanges = {
+      1: { start: new Date(2025, 1, 10), end: new Date(2025, 3, 30), dias: 53 }, // 10/02 a 30/04
+      2: { start: new Date(2025, 4, 5), end: new Date(2025, 6, 5), dias: 44 },   // 05/05 a 05/07
+      3: { start: new Date(2025, 6, 21), end: new Date(2025, 8, 30), dias: 53 }, // 21/07 a 30/09
+      4: { start: new Date(2025, 9, 1), end: new Date(2025, 11, 19), dias: 55 }, // 01/10 a 19/12
+    };
+
+    // Legendas dos eventos por bimestre
+    const bimestreLegendas = {
+      1: [
+        'Início das Aulas (10/02)',
+        'Semana Pedagógica',
+        'Carnaval',
+        'Feriados: Tiradentes, Sexta-feira Santa, Páscoa'
+      ],
+      2: [
+        'Dia do Trabalho (01/05)',
+        'Corpus Christi',
+        'Festa Junina'
+      ],
+      3: [
+        'Retorno das aulas (21/07)',
+        'Feriados do 2º semestre'
+      ],
+      4: [
+        'Feriados de Outubro, Novembro e Dezembro',
+        'Encerramento do ano letivo'
+      ]
+    };
+
+    // Cria/atualiza painel de total de dias do bimestre
+    function showBimestreTotalDias(bimestre) {
+      // Remove painel anterior
+      const oldPanel = document.getElementById('bimestreInfoPanel');
+      if (oldPanel) oldPanel.remove();
+
+      // Define onde inserir o total (após o último mês do bimestre)
+      const monthIdxEnd = [null, 3, 6, 8, 11][bimestre]; // 1: Abril, 2: Julho, 3: Setembro, 4: Dezembro
+      const months = document.querySelectorAll('.calendar-month');
+      if (!months[monthIdxEnd]) return;
+      const afterMonth = months[monthIdxEnd];
+
+      const infoPanel = document.createElement('div');
+      infoPanel.id = 'bimestreInfoPanel';
+      infoPanel.className = 'flex flex-col items-center my-4 w-full col-span-4';
+      infoPanel.innerHTML = `
+        <div class="bg-blue-50 rounded p-3 shadow text-center mb-2">
+          <div class="font-semibold">Total de dias do Bimestre: <span class="text-blue-700">${bimestreRanges[bimestre].dias}</span></div>
+        </div>
+      `;
+      afterMonth.after(infoPanel);
+    }
+
+    // Aplica destaque/desfoque nos dias do bimestre e mostra legendas por mês
+    function highlightBimestre(bimestre) {
+      const { start, end } = bimestreRanges[bimestre];
+      document.querySelectorAll('.calendar-month').forEach(monthDiv => {
+        monthDiv.classList.remove('selected', 'faded');
+        // Remove legendas de mês
+        const legend = monthDiv.querySelector('.month-events-legend');
+        if (legend) legend.remove();
+      });
+      document.querySelectorAll('.calendar-month').forEach((monthDiv, idx) => {
+        let anyInRange = false;
+        let monthEvents = [];
+        monthDiv.querySelectorAll('.grid > div').forEach(dayDiv => {
+          const day = parseInt(dayDiv.textContent);
+          const monthName = monthDiv.querySelector('h3').textContent;
+          const monthIdx = [
+            'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+          ].indexOf(monthName);
+          // Ignora cabeçalhos
+          if (isNaN(day)) return;
+          const date = new Date(2025, monthIdx, day);
+          if (date >= start && date <= end) {
+            dayDiv.style.opacity = '1';
+            dayDiv.style.filter = 'none';
+            anyInRange = true;
+            // Coleta eventos do dia
+            if (dayDiv.title) monthEvents.push(`${day.toString().padStart(2, '0')}/${(monthIdx + 1).toString().padStart(2, '0')}: ${dayDiv.title}`);
+          } else {
+            dayDiv.style.opacity = '0.3';
+            dayDiv.style.filter = 'blur(1.5px) grayscale(0.7)';
+          }
+        });
+        if (anyInRange) {
+          monthDiv.classList.add('selected');
+          monthDiv.classList.remove('faded');
+          // Adiciona legenda de eventos do mês
+          if (monthEvents.length > 0) {
+            const legendDiv = document.createElement('div');
+            legendDiv.className = 'month-events-legend';
+            legendDiv.innerHTML = `<ul>${monthEvents.map(ev => `<li>${ev}</li>`).join('')}</ul>`;
+            monthDiv.appendChild(legendDiv);
+          }
+        } else {
+          monthDiv.classList.add('faded');
+          monthDiv.classList.remove('selected');
+        }
+      });
+      showBimestreTotalDias(bimestre);
+    }
+
+    // Eventos dos botões
+    document.querySelectorAll('.bimestre-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.bimestre-btn').forEach(b => b.classList.remove('bg-blue-400', 'text-white'));
+        this.classList.add('bg-blue-400', 'text-white');
+        highlightBimestre(this.dataset.bimestre);
+      });
+    });
+
+    // Clique fora para limpar seleção (opcional)
+    document.addEventListener('click', function (e) {
+      if (!e.target.classList.contains('bimestre-btn')) {
+        document.querySelectorAll('.bimestre-btn').forEach(b => b.classList.remove('bg-blue-400', 'text-white'));
+        highlightBimestre(null);
+      }
     });
   </script>
 </body>
