@@ -583,10 +583,116 @@ function createMonthCalendar(monthData, monthIndex) {
 function initializeCalendar() {
   const container = document.getElementById("calendarContainer");
 
+  // Remove meses antigos se houver
+  container.querySelectorAll(".calendar-month").forEach((el) => el.remove());
+
   // Create calendar for each month
   calendarData.months.forEach((month, idx) => {
     const monthCalendar = createMonthCalendar(month, idx);
+    monthCalendar.dataset.monthIndex = idx;
     container.appendChild(monthCalendar);
+  });
+
+  // Clique para destacar mês e mostrar eventos
+  container.querySelectorAll(".calendar-month").forEach((monthDiv, idx) => {
+    monthDiv.addEventListener("click", function (e) {
+      const isSelected = monthDiv.classList.contains("selected");
+      // Se já está selecionado, desmarcar tudo
+      if (isSelected) {
+        container.querySelectorAll(".calendar-month").forEach((el) => {
+          el.classList.remove("selected");
+          el.classList.remove("faded");
+          const legend = el.querySelector(".month-events-legend");
+          if (legend) legend.remove();
+        });
+        return;
+      }
+      // Destacar mês clicado
+      container.querySelectorAll(".calendar-month").forEach((el, i) => {
+        el.classList.remove("selected");
+        el.classList.remove("faded");
+        // Remover legenda de eventos se houver
+        const legend = el.querySelector(".month-events-legend");
+        if (legend) legend.remove();
+      });
+      monthDiv.classList.add("selected");
+      container.querySelectorAll(".calendar-month").forEach((el, i) => {
+        if (i !== idx) el.classList.add("faded");
+      });
+      // Montar lista de eventos do mês (agrupando faixas)
+      const monthData = calendarData.months[idx];
+      const events = [];
+      monthData.days.forEach((day) => {
+        day.events.forEach((ev) => {
+          events.push({
+            date: day.date,
+            text: ev.text,
+            type: ev.type,
+          });
+        });
+      });
+      // Agrupar eventos iguais em faixas
+      let grouped = [];
+      let i = 0;
+      while (i < events.length) {
+        const curr = events[i];
+        let j = i + 1;
+        while (
+          j < events.length &&
+          events[j].text === curr.text &&
+          events[j].type === curr.type &&
+          events[j].date === events[j - 1].date + 1
+        ) {
+          j++;
+        }
+        if (j - i > 1) {
+          grouped.push({
+            range: [events[i].date, events[j - 1].date],
+            text: curr.text,
+          });
+        } else {
+          grouped.push({
+            range: [curr.date],
+            text: curr.text,
+          });
+        }
+        i = j;
+      }
+      // Criar HTML da legenda interna
+      let html = `<div class='month-events-legend'><strong>Eventos de ${monthData.name}</strong>`;
+      if (grouped.length === 0) {
+        html += "<div>Nenhum evento neste mês.</div>";
+      } else {
+        html += "<ul>";
+        grouped.forEach((ev) => {
+          if (ev.range.length === 1) {
+            html += `<li><b>${String(ev.range[0]).padStart(2, "0")}</b> - ${
+              ev.text
+            }</li>`;
+          } else {
+            html += `<li><b>De ${String(ev.range[0]).padStart(
+              2,
+              "0"
+            )} a ${String(ev.range[1]).padStart(2, "0")}</b> - ${ev.text}</li>`;
+          }
+        });
+        html += "</ul>";
+      }
+      html += "</div>";
+      // Inserir legenda abaixo do mês selecionado
+      monthDiv.insertAdjacentHTML("beforeend", html);
+    });
+  });
+
+  // Fechar popup/restaurar foco
+  popup.addEventListener("click", function (e) {
+    if (e.target.classList.contains("close-btn")) {
+      popup.classList.remove("active");
+      container.querySelectorAll(".calendar-month").forEach((el) => {
+        el.classList.remove("selected");
+        el.classList.remove("faded");
+      });
+    }
   });
 }
 
