@@ -408,14 +408,23 @@
         document.querySelectorAll('.bimestre-btn').forEach(b => b.classList.remove('bg-blue-400', 'text-white'));
         this.classList.add('bg-blue-400', 'text-white');
         highlightBimestre(this.dataset.bimestre);
+        // Atualiza o número de dias do bimestre no header
+        const dias = bimestreRanges[this.dataset.bimestre]?.dias;
+        const diasSpan = document.getElementById('bimestreTotalDias');
+        if (diasSpan) {
+          diasSpan.textContent = dias ? `${dias} dias` : '';
+        }
       });
     });
 
-    // Clique fora para limpar seleção (opcional)
+    // Limpa o número de dias ao clicar fora dos botões de bimestre
     document.addEventListener('click', function (e) {
       if (!e.target.classList.contains('bimestre-btn')) {
         document.querySelectorAll('.bimestre-btn').forEach(b => b.classList.remove('bg-blue-400', 'text-white'));
         highlightBimestre(null);
+        // Limpa o número de dias
+        const diasSpan = document.getElementById('bimestreTotalDias');
+        if (diasSpan) diasSpan.textContent = '';
       }
     });
 
