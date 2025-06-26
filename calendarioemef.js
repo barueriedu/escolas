@@ -40,8 +40,8 @@ const calendarData = {
     {
       name: "Fevereiro",
       days: [
-        { date: 1, events: [{ type: "ferias", text: "Férias Escolares" }] },
-        { date: 2, events: [{ type: "ferias", text: "Férias Escolares" }] },
+        { date: 1, events: [] },
+        { date: 2, events: [] },
         {
           date: 3,
           events: [{ type: "pedagogica", text: "Semana Pedagógica" }],
@@ -361,11 +361,14 @@ const calendarData = {
         { date: 8, events: [] },
         { date: 9, events: [] },
         { date: 10, events: [] },
-        { date: 12, events: [{ type: "feriado", text: "Nossa Senhora" }] },
+        { date: 12, events: [] },
         { date: 11, events: [] },
         { date: 13, events: [] },
         { date: 14, events: [] },
-        { date: 15, events: [{ type: "Dia sem Expediente", text: "Dia do Professor" }]},
+        {
+          date: 15,
+          events: [{ type: "Dia sem Expediente", text: "Dia do Professor" }],
+        },
         { date: 16, events: [] },
         { date: 17, events: [] },
         { date: 18, events: [] },
@@ -393,8 +396,8 @@ const calendarData = {
     {
       name: "Novembro",
       days: [
-        { date: 1, events: [{ type: "feriado", text: "Todos os Santos" }] },
-        { date: 2, events: [{ type: "feriado", text: "Finados" }] },
+        { date: 1, events: [] },
+        { date: 2, events: [] },
         { date: 3, events: [] },
         { date: 4, events: [] },
         { date: 5, events: [] },
@@ -606,16 +609,29 @@ function initializeCalendar() {
 
   // Clique para destacar mês e mostrar eventos
   container.querySelectorAll(".calendar-month").forEach((monthDiv, idx) => {
+    monthDiv.style.display = "";
+    let anyInRange = false;
+    let monthEvents = [];
     monthDiv.addEventListener("click", function (e) {
+      // Remove painel de total de dias do bimestre, se existir
+      const infoPanel = document.getElementById("bimestreInfoPanel");
+      if (infoPanel) infoPanel.remove();
+      // Remove todas as classes de destaque/desfoque de todos os meses
+      container.querySelectorAll(".calendar-month").forEach((el) => {
+        el.classList.remove("selected");
+        el.classList.remove("faded");
+        // Remove legendas de eventos se houver
+        const legend = el.querySelector(".month-events-legend");
+        if (legend) legend.remove();
+        // Remove opacidade/filtro dos dias
+        el.querySelectorAll(".grid > div").forEach((dayDiv) => {
+          dayDiv.style.opacity = "";
+          dayDiv.style.filter = "";
+        });
+      });
       const isSelected = monthDiv.classList.contains("selected");
       // Se já está selecionado, desmarcar tudo
       if (isSelected) {
-        container.querySelectorAll(".calendar-month").forEach((el) => {
-          el.classList.remove("selected");
-          el.classList.remove("faded");
-          const legend = el.querySelector(".month-events-legend");
-          if (legend) legend.remove();
-        });
         return;
       }
       // Destacar mês clicado
@@ -670,24 +686,21 @@ function initializeCalendar() {
         i = j;
       }
       // Criar HTML da legenda interna
-      let html = `<div class='month-events-legend'><strong>Eventos de ${monthData.name}</strong>`;
+      let html = `<div class='month-events-legend'>`;
       if (grouped.length === 0) {
         html += "<div>Nenhum evento neste mês.</div>";
       } else {
-        html += "<ul>";
         grouped.forEach((ev) => {
           if (ev.range.length === 1) {
-            html += `<li><b>${String(ev.range[0]).padStart(2, "0")}</b> - ${
+            html += `<div><b>${String(ev.range[0]).padStart(2, "0")}</b> - ${
               ev.text
-            }</li>`;
+            }</div>`;
           } else {
-            html += `<li><b>De ${String(ev.range[0]).padStart(
-              2,
-              "0"
-            )} a ${String(ev.range[1]).padStart(2, "0")}</b> - ${ev.text}</li>`;
+            html += `<div><b>${String(ev.range[0]).padStart(2, "0")}-${String(
+              ev.range[1]
+            ).padStart(2, "0")}</b> - ${ev.text}</div>`;
           }
         });
-        html += "</ul>";
       }
       html += "</div>";
       // Inserir legenda abaixo do mês selecionado
@@ -709,3 +722,100 @@ function initializeCalendar() {
 
 // Run when the page loads
 document.addEventListener("DOMContentLoaded", initializeCalendar);
+
+document.addEventListener("click", function (e) {
+  // Se não clicou em um mês nem em um botão de bimestre
+  if (
+    !e.target.closest(".calendar-month") &&
+    !e.target.classList.contains("bimestre-btn")
+  ) {
+    // Limpa seleção de bimestre
+    document
+      .querySelectorAll(".bimestre-btn")
+      .forEach((b) => b.classList.remove("bg-blue-400", "text-white"));
+    // Remove destaques/desfoques/legendas de todos os meses
+    document.querySelectorAll(".calendar-month").forEach((m) => {
+      m.classList.remove("selected", "faded");
+      m.querySelectorAll(".grid > div").forEach((dayDiv) => {
+        dayDiv.style.opacity = "";
+        dayDiv.style.filter = "";
+      });
+      const legend = m.querySelector(".month-events-legend");
+      if (legend) legend.remove();
+    });
+  }
+});
+
+function showBimestreTotalDias(bimestre) {
+  const span = document.getElementById("bimestreTotalDias");
+  if (!span) return;
+  if (!bimestre) {
+    span.textContent = "";
+    return;
+  }
+  span.textContent = `${bimestreRanges[bimestre].dias} dias`;
+}
+
+function highlightBimestre(bimestre) {
+  const { start, end } = bimestreRanges[bimestre];
+  document.querySelectorAll(".calendar-month").forEach((monthDiv) => {
+    monthDiv.style.display = "";
+    let anyInRange = false;
+    let monthEvents = [];
+    monthDiv.querySelectorAll(".grid > div").forEach((dayDiv) => {
+      const day = parseInt(dayDiv.textContent);
+      const monthName = monthDiv.querySelector("h3").textContent;
+      const monthIdx = [
+        "Janeiro",
+        "Fevereiro",
+        "Março",
+        "Abril",
+        "Maio",
+        "Junho",
+        "Julho",
+        "Agosto",
+        "Setembro",
+        "Outubro",
+        "Novembro",
+        "Dezembro",
+      ].indexOf(monthName);
+      // Ignora cabeçalhos
+      if (isNaN(day)) return;
+      const date = new Date(2025, monthIdx, day);
+      if (date >= start && date <= end) {
+        dayDiv.style.opacity = "1";
+        dayDiv.style.filter = "none";
+        anyInRange = true;
+        // Coleta eventos do dia
+        if (dayDiv.title)
+          monthEvents.push(
+            `${day.toString().padStart(2, "0")}/${(monthIdx + 1)
+              .toString()
+              .padStart(2, "0")}: ${dayDiv.title}`
+          );
+      } else {
+        dayDiv.style.opacity = "0.3";
+        dayDiv.style.filter = "blur(1.5px) grayscale(0.7)";
+      }
+    });
+    if (anyInRange) {
+      monthDiv.classList.add("selected");
+      monthDiv.classList.remove("faded");
+      // Adiciona eventos do mês como texto simples
+      if (monthEvents.length > 0) {
+        const legendDiv = document.createElement("div");
+        legendDiv.className = "month-events-legend";
+        legendDiv.innerHTML = monthEvents
+          .map((ev) => `<div style='margin:0;padding:0;'>${ev}</div>`)
+          .join("");
+        monthDiv.appendChild(legendDiv);
+      }
+    } else {
+      monthDiv.classList.add("faded");
+      monthDiv.classList.remove("selected");
+      // Garante que o mês continue visível (não desapareça)
+      monthDiv.style.display = "";
+    }
+  });
+  showBimestreTotalDias(bimestre);
+}
