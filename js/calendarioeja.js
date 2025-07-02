@@ -1,508 +1,6 @@
 // Calendário EJA 2025
 // Calendar data for 2025
-(function() {
-  const calendarDataEJA = {
-    months: [
-      {
-        name: "Janeiro",
-        days: [
-          { date: 1, events: [{ type: "feriado", text: "Ano Novo" }] },
-          { date: 2, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 3, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 4, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 5, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 6, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 7, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 8, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 9, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 10, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 11, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 12, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 13, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 14, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 15, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 16, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 17, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 18, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 19, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 20, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 21, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 22, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 23, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 24, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 25, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 26, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 27, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 28, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 29, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 30, events: [{ type: "ferias", text: "Férias Escolares" }] },
-          { date: 31, events: [{ type: "ferias", text: "Férias Escolares" }] },
-        ],
-      },
-      {
-        name: "Fevereiro",
-        days: [
-          { date: 1, events: [] },
-          { date: 2, events: [] },
-          {
-            date: 3,
-            events: [{ type: "pedagogica", text: "Semana Pedagógica" }],
-          },
-          {
-            date: 4,
-            events: [{ type: "pedagogica", text: "Semana Pedagógica" }],
-          },
-          {
-            date: 5,
-            events: [{ type: "pedagogica", text: "Semana Pedagógica" }],
-          },
-          {
-            date: 6,
-            events: [{ type: "pedagogica", text: "Semana Pedagógica" }],
-          },
-          {
-            date: 7,
-            events: [{ type: "pedagogica", text: "Semana Pedagógica" }],
-          },
-          { date: 8, events: [{ type: "reuniao", text: "Reunião de Pais" }] },
-          { date: 9, events: [] },
-          { date: 10, events: [{ type: "inicio", text: "Início das Aulas" }] },
-          { date: 11, events: [] },
-          { date: 12, events: [] },
-          { date: 13, events: [] },
-          { date: 14, events: [] },
-          { date: 15, events: [] },
-          { date: 16, events: [] },
-          { date: 17, events: [] },
-          { date: 18, events: [] },
-          { date: 19, events: [] },
-          { date: 20, events: [] },
-          { date: 21, events: [] },
-          { date: 22, events: [] },
-          { date: 23, events: [] },
-          { date: 24, events: [] },
-          { date: 25, events: [] },
-          { date: 26, events: [] },
-          { date: 27, events: [] },
-          { date: 28, events: [] },
-        ],
-      },
-      {
-        name: "Março",
-        days: [
-          { date: 1, events: [] },
-          { date: 2, events: [] },
-          { date: 3, events: [{ type: "feriado", text: "Feriado/Carnaval" }] },
-          { date: 4, events: [{ type: "feriado", text: "Feriado/Carnaval" }] },
-          { date: 5, events: [] },
-          { date: 6, events: [] },
-          { date: 7, events: [] },
-          { date: 8, events: [] },
-          { date: 9, events: [] },
-          { date: 10, events: [] },
-          { date: 11, events: [] },
-          { date: 12, events: [] },
-          { date: 13, events: [] },
-          { date: 14, events: [] },
-          { date: 15, events: [] },
-          { date: 16, events: [] },
-          { date: 17, events: [] },
-          { date: 18, events: [] },
-          { date: 19, events: [] },
-          { date: 20, events: [] },
-          { date: 21, events: [] },
-          { date: 22, events: [] },
-          { date: 23, events: [] },
-          { date: 24, events: [] },
-          { date: 25, events: [] },
-          {
-            date: 26,
-            events: [{ type: "feriado", text: "Feriado/Emancipação Barueri" }],
-          },
-          { date: 27, events: [] },
-          { date: 28, events: [] },
-          { date: 29, events: [] },
-          { date: 30, events: [] },
-          { date: 31, events: [] },
-        ],
-      },
-      {
-        name: "Abril",
-        days: [
-          { date: 1, events: [] },
-          { date: 2, events: [] },
-          { date: 3, events: [] },
-          { date: 4, events: [] },
-          { date: 5, events: [] },
-          { date: 6, events: [] },
-          { date: 7, events: [] },
-          { date: 8, events: [] },
-          { date: 9, events: [] },
-          { date: 10, events: [] },
-          { date: 11, events: [] },
-          { date: 12, events: [] },
-          { date: 13, events: [] },
-          { date: 14, events: [] },
-          { date: 15, events: [] },
-          { date: 16, events: [] },
-          { date: 17, events: [{ type: "feriado", text: "Endoenças" }] },
-          { date: 18, events: [{ type: "feriado", text: "Sexta-feira Santa" }] },
-          { date: 19, events: [] },
-          { date: 20, events: [{ type: "feriado", text: "Páscoa" }] },
-          { date: 21, events: [{ type: "feriado", text: "Tiradentes" }] },
-          { date: 22, events: [] },
-          { date: 23, events: [] },
-          { date: 24, events: [] },
-          { date: 25, events: [] },
-          { date: 26, events: [] },
-          { date: 27, events: [] },
-          { date: 28, events: [] },
-          { date: 29, events: [] },
-          { date: 30, events: [] },
-        ],
-      },
-      {
-        name: "Maio",
-        days: [
-          { date: 1, events: [{ type: "feriado", text: "Dia do Trabalho" }] },
-          {
-            date: 2,
-            events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
-          },
-          { date: 3, events: [] },
-          { date: 4, events: [] },
-          { date: 5, events: [] },
-          { date: 6, events: [] },
-          { date: 7, events: [] },
-          { date: 8, events: [{ type: "evento", text: "Conselho de Classe" }] },
-          { date: 9, events: [{ type: "evento", text: "Conselho de Classe" }] },
-          { date: 10, events: [] },
-          { date: 11, events: [] },
-          { date: 12, events: [] },
-          { date: 13, events: [] },
-          { date: 14, events: [] },
-          { date: 15, events: [] },
-          { date: 16, events: [] },
-          { date: 17, events: [] },
-          { date: 18, events: [] },
-          { date: 19, events: [] },
-          { date: 20, events: [] },
-          { date: 21, events: [] },
-          { date: 22, events: [] },
-          { date: 23, events: [] },
-          { date: 24, events: [] },
-          { date: 25, events: [] },
-          { date: 26, events: [] },
-          { date: 27, events: [] },
-          { date: 28, events: [] },
-          { date: 29, events: [] },
-          { date: 30, events: [] },
-          { date: 31, events: [] },
-        ],
-      },
-      {
-        name: "Junho",
-        days: [
-          { date: 1, events: [] },
-          { date: 2, events: [] },
-          { date: 3, events: [] },
-          { date: 4, events: [] },
-          { date: 5, events: [] },
-          { date: 6, events: [] },
-          { date: 7, events: [] },
-          { date: 8, events: [] },
-          { date: 9, events: [] },
-          { date: 10, events: [] },
-          { date: 11, events: [] },
-          { date: 12, events: [] },
-          { date: 13, events: [] },
-          { date: 14, events: [{ type: "evento", text: "Festa Junina" }] },
-          { date: 15, events: [] },
-          { date: 16, events: [] },
-          { date: 17, events: [] },
-          { date: 18, events: [] },
-          { date: 19, events: [{ type: "feriado", text: "Corpus Christi" }] },
-          {
-            date: 20,
-            events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
-          },
-          { date: 21, events: [] },
-          { date: 22, events: [] },
-          {
-            date: 23,
-            events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
-          },
-          {
-            date: 24,
-            events: [{ type: "feriado", text: "Padroeiro São João Batista" }],
-          },
-          { date: 25, events: [] },
-          { date: 26, events: [{ type: "evento", text: "Conselho de Classe" }] },
-          { date: 27, events: [{ type: "evento", text: "Conselho de Classe" }] },
-          { date: 29, events: [] },
-          { date: 30, events: [] },
-        ],
-      },
-      {
-        name: "Julho",
-        days: [
-          { date: 1, events: [] },
-          { date: 2, events: [] },
-          { date: 3, events: [] },
-          { date: 4, events: [{ type: "reuniao", text: "Reunião de Pais" }] },
-          { date: 5, events: [] },
-          { date: 6, events: [] },
-          { date: 7, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 8, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 9, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 10, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 11, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 12, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 13, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 14, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 15, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 16, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 17, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 18, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 19, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 20, events: [{ type: "ferias", text: "Recesso Escolar" }] },
-          { date: 21, events: [] },
-          { date: 22, events: [] },
-          { date: 23, events: [] },
-          { date: 24, events: [] },
-          { date: 25, events: [] },
-          { date: 26, events: [] },
-          { date: 27, events: [] },
-          { date: 28, events: [] },
-          { date: 29, events: [] },
-          { date: 30, events: [] },
-          { date: 31, events: [] },
-        ],
-      },
-      {
-        name: "Agosto",
-        days: [
-          { date: 1, events: [] },
-          { date: 2, events: [] },
-          { date: 3, events: [] },
-          { date: 4, events: [] },
-          { date: 5, events: [] },
-          { date: 6, events: [] },
-          { date: 7, events: [] },
-          { date: 8, events: [] },
-          { date: 9, events: [] },
-          { date: 10, events: [] },
-          { date: 11, events: [] },
-          { date: 12, events: [] },
-          { date: 13, events: [] },
-          { date: 14, events: [] },
-          { date: 15, events: [] },
-          { date: 16, events: [] },
-          { date: 17, events: [] },
-          { date: 18, events: [] },
-          { date: 19, events: [] },
-          { date: 20, events: [] },
-          { date: 21, events: [] },
-          { date: 22, events: [] },
-          { date: 23, events: [] },
-          { date: 24, events: [] },
-          { date: 25, events: [] },
-          { date: 26, events: [] },
-          { date: 27, events: [] },
-          { date: 28, events: [] },
-          { date: 29, events: [] },
-          { date: 30, events: [] },
-          { date: 31, events: [] },
-        ],
-      },
-      {
-        name: "Setembro",
-        days: [
-          { date: 1, events: [] },
-          { date: 2, events: [] },
-          { date: 3, events: [] },
-          { date: 4, events: [] },
-          { date: 5, events: [] },
-          { date: 6, events: [] },
-          { date: 7, events: [{ type: "evento", text: "Civico Militar" }] },
-          { date: 8, events: [] },
-          { date: 9, events: [] },
-          { date: 10, events: [] },
-          { date: 11, events: [] },
-          { date: 12, events: [] },
-          { date: 13, events: [] },
-          { date: 14, events: [] },
-          { date: 15, events: [] },
-          { date: 16, events: [] },
-          { date: 17, events: [] },
-          { date: 18, events: [] },
-          { date: 19, events: [] },
-          { date: 20, events: [] },
-          { date: 21, events: [] },
-          { date: 22, events: [] },
-          { date: 23, events: [] },
-          { date: 24, events: [] },
-          { date: 25, events: [{ type: "evento", text: "Conselho de Classe" }] },
-          { date: 26, events: [{ type: "evento", text: "Conselho de Classe" }] },
-          { date: 27, events: [] },
-          { date: 28, events: [] },
-          { date: 29, events: [] },
-          { date: 30, events: [] },
-        ],
-      },
-      {
-        name: "Outubro",
-        days: [
-          { date: 1, events: [] },
-          { date: 2, events: [] },
-          { date: 3, events: [] },
-          { date: 4, events: [{ type: "reuniao", text: "Reunião de Pais" }] },
-          { date: 5, events: [] },
-          { date: 6, events: [] },
-          { date: 7, events: [] },
-          { date: 8, events: [] },
-          { date: 9, events: [] },
-          { date: 10, events: [] },
-          { date: 12, events: [] },
-          { date: 11, events: [] },
-          { date: 13, events: [] },
-          { date: 14, events: [] },
-          {
-            date: 15,
-            events: [{ type: "Dia sem Expediente", text: "Dia do Professor" }],
-          },
-          { date: 16, events: [] },
-          { date: 17, events: [] },
-          { date: 18, events: [] },
-          { date: 19, events: [] },
-          { date: 20, events: [] },
-          { date: 21, events: [] },
-          { date: 22, events: [] },
-          { date: 23, events: [] },
-          { date: 24, events: [] },
-          { date: 25, events: [] },
-          { date: 26, events: [] },
-          {
-            date: 27,
-            events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
-          },
-          {
-            date: 28,
-            events: [{ type: "feriado", text: "Funcionário Publico" }],
-          },
-          { date: 29, events: [] },
-          { date: 30, events: [] },
-          { date: 31, events: [] },
-        ],
-      },
-      {
-        name: "Novembro",
-        days: [
-          { date: 1, events: [] },
-          { date: 2, events: [] },
-          { date: 3, events: [] },
-          { date: 4, events: [] },
-          { date: 5, events: [] },
-          { date: 6, events: [{ type: "reuniao", text: "Reunião de Pais" }] },
-          { date: 7, events: [] },
-          { date: 8, events: [] },
-          { date: 9, events: [] },
-          { date: 10, events: [] },
-          { date: 11, events: [] },
-          { date: 12, events: [] },
-          { date: 13, events: [] },
-          { date: 14, events: [] },
-          {
-            date: 15,
-            events: [{ type: "feriado", text: "Proclamação da República" }],
-          },
-          { date: 16, events: [] },
-          { date: 17, events: [] },
-          { date: 18, events: [] },
-          { date: 19, events: [] },
-          { date: 20, events: [{ type: "feriado", text: "Consciencia Negra" }] },
-          {
-            date: 21,
-            events: [{ type: "feriado", text: "Nossa Senhora da Escada" }],
-          },
-          { date: 22, events: [] },
-          { date: 23, events: [] },
-          { date: 24, events: [] },
-          { date: 25, events: [] },
-          { date: 26, events: [] },
-          { date: 27, events: [] },
-          { date: 28, events: [] },
-          { date: 29, events: [] },
-          { date: 30, events: [] },
-        ],
-      },
-      {
-        name: "Dezembro",
-        days: [
-          { date: 1, events: [] },
-          { date: 2, events: [] },
-          { date: 3, events: [] },
-          { date: 4, events: [{ type: "evento", text: "Conselho de Classe" }] },
-          { date: 5, events: [{ type: "evento", text: "Conselho de Classe" }] },
-          { date: 6, events: [] },
-          { date: 7, events: [] },
-          { date: 8, events: [] },
-          { date: 9, events: [] },
-          { date: 10, events: [] },
-          { date: 11, events: [] },
-          { date: 12, events: [] },
-          { date: 13, events: [] },
-          { date: 14, events: [] },
-          { date: 15, events: [] },
-          { date: 16, events: [] },
-          { date: 17, events: [] },
-          { date: 18, events: [] },
-          { date: 19, events: [] },
-          { date: 20, events: [] },
-          { date: 21, events: [] },
-          { date: 22, events: [] },
-          { date: 23, events: [] },
-          {
-            date: 24,
-            events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
-          },
-          { date: 25, events: [] },
-          {
-            date: 26,
-            events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
-          },
-          { date: 27, events: [] },
-          { date: 28, events: [] },
-          { date: 29, events: [] },
-          { date: 30, events: [] },
-          {
-            date: 31,
-            events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
-          },
-        ],
-      },
-    ],
-  };
-
-  function initializeCalendarEJA() {
-    // Exemplo: renderizar calendário EJA
-    console.log('Inicializando calendário EJA', calendarDataEJA);
-    // Aqui vai a lógica de renderização específica
-  }
-
-  // Inicialização automática ao carregar o script
-  initializeCalendarEJA();
-})();
-
-// Function to create a calendar month
-function createMonthCalendar(monthData, monthIndex) {
-  const monthDiv = document.createElement("div");
-  monthDiv.className = "calendar-month bg-white p-3 rounded-lg shadow-md mb-4";
-
-  const monthHeader = document.createElement("h3");
-// Calendário EJA 2025
-// Calendar data for 2025
-const calendarData = {
+const calendarDataEJA = {
   months: [
     {
       name: "Janeiro",
@@ -647,7 +145,10 @@ const calendarData = {
         { date: 15, events: [] },
         { date: 16, events: [] },
         { date: 17, events: [{ type: "feriado", text: "Endoenças" }] },
-        { date: 18, events: [{ type: "feriado", text: "Sexta-feira Santa" }] },
+        {
+          date: 18,
+          events: [{ type: "feriado", text: "Sexta-feira Santa" }],
+        },
         { date: 19, events: [] },
         { date: 20, events: [{ type: "feriado", text: "Páscoa" }] },
         { date: 21, events: [{ type: "feriado", text: "Tiradentes" }] },
@@ -668,7 +169,9 @@ const calendarData = {
         { date: 1, events: [{ type: "feriado", text: "Dia do Trabalho" }] },
         {
           date: 2,
-          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+          events: [
+            { type: "Dia sem Expediente", text: "Dia sem Expediente" },
+          ],
         },
         { date: 3, events: [] },
         { date: 4, events: [] },
@@ -725,21 +228,31 @@ const calendarData = {
         { date: 19, events: [{ type: "feriado", text: "Corpus Christi" }] },
         {
           date: 20,
-          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+          events: [
+            { type: "Dia sem Expediente", text: "Dia sem Expediente" },
+          ],
         },
         { date: 21, events: [] },
         { date: 22, events: [] },
         {
           date: 23,
-          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+          events: [
+            { type: "Dia sem Expediente", text: "Dia sem Expediente" },
+          ],
         },
         {
           date: 24,
           events: [{ type: "feriado", text: "Padroeiro São João Batista" }],
         },
         { date: 25, events: [] },
-        { date: 26, events: [{ type: "evento", text: "Conselho de Classe" }] },
-        { date: 27, events: [{ type: "evento", text: "Conselho de Classe" }] },
+        {
+          date: 26,
+          events: [{ type: "evento", text: "Conselho de Classe" }],
+        },
+        {
+          date: 27,
+          events: [{ type: "evento", text: "Conselho de Classe" }],
+        },
         { date: 29, events: [] },
         { date: 30, events: [] },
       ],
@@ -843,8 +356,14 @@ const calendarData = {
         { date: 22, events: [] },
         { date: 23, events: [] },
         { date: 24, events: [] },
-        { date: 25, events: [{ type: "evento", text: "Conselho de Classe" }] },
-        { date: 26, events: [{ type: "evento", text: "Conselho de Classe" }] },
+        {
+          date: 25,
+          events: [{ type: "evento", text: "Conselho de Classe" }],
+        },
+        {
+          date: 26,
+          events: [{ type: "evento", text: "Conselho de Classe" }],
+        },
         { date: 27, events: [] },
         { date: 28, events: [] },
         { date: 29, events: [] },
@@ -885,7 +404,9 @@ const calendarData = {
         { date: 26, events: [] },
         {
           date: 27,
-          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+          events: [
+            { type: "Dia sem Expediente", text: "Dia sem Expediente" },
+          ],
         },
         {
           date: 28,
@@ -921,7 +442,10 @@ const calendarData = {
         { date: 17, events: [] },
         { date: 18, events: [] },
         { date: 19, events: [] },
-        { date: 20, events: [{ type: "feriado", text: "Consciencia Negra" }] },
+        {
+          date: 20,
+          events: [{ type: "feriado", text: "Consciencia Negra" }],
+        },
         {
           date: 21,
           events: [{ type: "feriado", text: "Nossa Senhora da Escada" }],
@@ -965,12 +489,16 @@ const calendarData = {
         { date: 23, events: [] },
         {
           date: 24,
-          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+          events: [
+            { type: "Dia sem Expediente", text: "Dia sem Expediente" },
+          ],
         },
         { date: 25, events: [] },
         {
           date: 26,
-          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+          events: [
+            { type: "Dia sem Expediente", text: "Dia sem Expediente" },
+          ],
         },
         { date: 27, events: [] },
         { date: 28, events: [] },
@@ -978,13 +506,16 @@ const calendarData = {
         { date: 30, events: [] },
         {
           date: 31,
-          events: [{ type: "Dia sem Expediente", text: "Dia sem Expediente" }],
+          events: [
+            { type: "Dia sem Expediente", text: "Dia sem Expediente" },
+          ],
         },
       ],
     },
   ],
 };
 
+(function () {
 // Function to create a calendar month
 function createMonthCalendar(monthData, monthIndex) {
   const monthDiv = document.createElement("div");
@@ -1099,127 +630,11 @@ function createMonthCalendar(monthData, monthIndex) {
 // Initialize calendar
 function initializeCalendar() {
   const container = document.getElementById("calendarContainer");
-
-  // Remove meses antigos se houver
-  container.querySelectorAll(".calendar-month").forEach((el) => el.remove());
-
-  // Create calendar for each month
-  calendarData.months.forEach((month, idx) => {
+  if (!container) return;
+  container.innerHTML = "";
+  calendarDataEJA.months.forEach((month, idx) => {
     const monthCalendar = createMonthCalendar(month, idx);
-    monthCalendar.dataset.monthIndex = idx;
     container.appendChild(monthCalendar);
-  });
-
-  // Clique para destacar mês e mostrar eventos
-  container.querySelectorAll(".calendar-month").forEach((monthDiv, idx) => {
-    monthDiv.style.display = "";
-    let anyInRange = false;
-    let monthEvents = [];
-    monthDiv.addEventListener("click", function (e) {
-      // Remove painel de total de dias do bimestre, se existir
-      const infoPanel = document.getElementById("bimestreInfoPanel");
-      if (infoPanel) infoPanel.remove();
-      // Remove todas as classes de destaque/desfoque de todos os meses
-      container.querySelectorAll(".calendar-month").forEach((el) => {
-        el.classList.remove("selected");
-        el.classList.remove("faded");
-        // Remove legendas de eventos se houver
-        const legend = el.querySelector(".month-events-legend");
-        if (legend) legend.remove();
-        // Remove opacidade/filtro dos dias
-        el.querySelectorAll(".grid > div").forEach((dayDiv) => {
-          dayDiv.style.opacity = "";
-          dayDiv.style.filter = "";
-        });
-      });
-      const isSelected = monthDiv.classList.contains("selected");
-      // Se já está selecionado, desmarcar tudo
-      if (isSelected) {
-        return;
-      }
-      // Destacar mês clicado
-      container.querySelectorAll(".calendar-month").forEach((el, i) => {
-        el.classList.remove("selected");
-        el.classList.remove("faded");
-        // Remover legenda de eventos se houver
-        const legend = el.querySelector(".month-events-legend");
-        if (legend) legend.remove();
-      });
-      monthDiv.classList.add("selected");
-      container.querySelectorAll(".calendar-month").forEach((el, i) => {
-        if (i !== idx) el.classList.add("faded");
-      });
-      // Montar lista de eventos do mês (agrupando faixas)
-      const monthData = calendarData.months[idx];
-      const events = [];
-      monthData.days.forEach((day) => {
-        day.events.forEach((ev) => {
-          events.push({
-            date: day.date,
-            text: ev.text,
-            type: ev.type,
-          });
-        });
-      });
-      // Agrupar eventos iguais em faixas
-      let grouped = [];
-      let i = 0;
-      while (i < events.length) {
-        const curr = events[i];
-        let j = i + 1;
-        while (
-          j < events.length &&
-          events[j].text === curr.text &&
-          events[j].type === curr.type &&
-          events[j].date === events[j - 1].date + 1
-        ) {
-          j++;
-        }
-        if (j - i > 1) {
-          grouped.push({
-            range: [events[i].date, events[j - 1].date],
-            text: curr.text,
-          });
-        } else {
-          grouped.push({
-            range: [curr.date],
-            text: curr.text,
-          });
-        }
-        i = j;
-      }
-      // Criar HTML da legenda interna
-      let html = `<div class='month-events-legend'>`;
-      if (grouped.length === 0) {
-        html += "<div>Nenhum evento neste mês.</div>";
-      } else {
-        grouped.forEach((ev) => {
-          if (ev.range.length === 1) {
-            html += `<div><b>${String(ev.range[0]).padStart(2, "0")}</b> - ${
-              ev.text
-            }</div>`;
-          } else {
-            html += `<div><b>${String(ev.range[0]).padStart(2, "0")}-${String(
-              ev.range[1]
-            ).padStart(2, "0")}</b> - ${ev.text}</div>`;
-          }
-        });
-      }
-      html += "</div>";
-      // Inserir legenda abaixo do mês selecionado
-      monthDiv.insertAdjacentHTML("beforeend", html);
-    });
-  });
-
-  // Fechar popup/restaurar foco
-  popup.addEventListener("click", function (e) {
-    if (e.target.classList.contains("close-btn")) {
-      popup.classList.remove("active");
-      container.querySelectorAll(".calendar-month").forEach((el) => {
-        el.classList.remove("selected");
-        el.classList.remove("faded");
-      });
-    }
   });
 }
 
@@ -1323,5 +738,5 @@ function highlightBimestre(bimestre) {
   showBimestreTotalDias(bimestre);
 }
 
-
-// ... código do calendário ... 
+// ... código do calendário ...
+})();

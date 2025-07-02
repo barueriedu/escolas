@@ -750,7 +750,18 @@ function showBimestreTotalDias(bimestre) {
   const span = document.getElementById("bimestreTotalDias");
   if (!span) return;
   if (!bimestre) {
-    span.textContent = "";
+    // Calcular total de dias letivos do ano
+    let totalLetivos = 0;
+    calendarData.months.forEach((month) => {
+      month.days.forEach((day) => {
+        // Considera letivo se NÃO for feriado nem férias
+        const isLetivo = !day.events.some(
+          (ev) => ev.type === "feriado" || ev.type === "ferias"
+        );
+        if (isLetivo) totalLetivos++;
+      });
+    });
+    span.textContent = `${totalLetivos} dias letivos`;
     return;
   }
   span.textContent = `${bimestreRanges[bimestre].dias} dias`;
@@ -819,3 +830,33 @@ function highlightBimestre(bimestre) {
   });
   showBimestreTotalDias(bimestre);
 }
+
+document.querySelectorAll(".bimestre-btn").forEach((btn) => {
+  btn.addEventListener("click", function () {
+    document
+      .querySelectorAll(".bimestre-btn")
+      .forEach((b) => b.classList.remove("bg-blue-400", "text-white"));
+    this.classList.add("bg-blue-400", "text-white");
+    highlightBimestre(this.dataset.bimestre);
+    // Atualiza o número de dias do bimestre no header
+    const dias = bimestreRanges[this.dataset.bimestre]?.dias;
+    const diasSpan = document.getElementById("bimestreTotalDias");
+    if (diasSpan) {
+      if (dias) {
+        diasSpan.textContent = `${dias} dias`;
+        diasSpan.classList.remove("hidden");
+      } else {
+        diasSpan.textContent = "";
+        diasSpan.classList.add("hidden");
+      }
+    }
+  });
+});
+// Ao clicar fora dos botões, esconder o campo de dias
+const diasSpan = document.getElementById("bimestreTotalDias");
+document.addEventListener("click", function (e) {
+  if (!e.target.classList.contains("bimestre-btn") && diasSpan) {
+    diasSpan.textContent = "";
+    diasSpan.classList.add("hidden");
+  }
+});

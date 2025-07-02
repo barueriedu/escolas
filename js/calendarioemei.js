@@ -823,18 +823,32 @@ function highlightBimestre(bimestre) {
 
 // ... código do calendário ...
 
-// Calendário EMEI 2025
-(function () {
-  const calendarDataEMEI = {
-    // ...dados do calendário EMEI...
-  };
-
-  function initializeCalendarEMEI() {
-    // Exemplo: renderizar calendário EMEI
-    console.log("Inicializando calendário EMEI", calendarDataEMEI);
-    // Aqui vai a lógica de renderização específica
+document.querySelectorAll(".bimestre-btn").forEach((btn) => {
+  btn.addEventListener("click", function () {
+    document
+      .querySelectorAll(".bimestre-btn")
+      .forEach((b) => b.classList.remove("bg-blue-400", "text-white"));
+    this.classList.add("bg-blue-400", "text-white");
+    highlightBimestre(this.dataset.bimestre);
+    // Atualiza o número de dias do bimestre no header
+    const dias = bimestreRanges[this.dataset.bimestre]?.dias;
+    const diasSpan = document.getElementById("bimestreTotalDias");
+    if (diasSpan) {
+      if (dias) {
+        diasSpan.textContent = `${dias} dias`;
+        diasSpan.classList.remove("hidden");
+      } else {
+        diasSpan.textContent = "";
+        diasSpan.classList.add("hidden");
+      }
+    }
+  });
+});
+// Ao clicar fora dos botões, esconder o campo de dias
+const diasSpan = document.getElementById("bimestreTotalDias");
+document.addEventListener("click", function (e) {
+  if (!e.target.classList.contains("bimestre-btn") && diasSpan) {
+    diasSpan.textContent = "";
+    diasSpan.classList.add("hidden");
   }
-
-  // Inicialização automática ao carregar o script
-  initializeCalendarEMEI();
-})();
+});
