@@ -8,7 +8,7 @@
   <title>Busca de Escolas</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
@@ -17,6 +17,7 @@
       border: none;
     }
 
+
     .custom-div-icon div {
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
@@ -24,40 +25,41 @@
 </head>
 
 <body class="bg-gray-50 min-h-screen">
-  <!-- Header -->
   <header class="text-white shadow-lg fixed-header">
     <div class="container mx-auto px-4 py-6">
       <div class="flex flex-col md:flex-row justify-between items-center">
         <div class="flex items-center mb-4 md:mb-0">
-          <img src="logo_Barueri_Educ_PNG.png" alt="Logo Barueri Educação" class="header-logo mr-3">
+          <img src="img/logo_Barueri_Educ_PNG.png" alt="Logo Barueri Educação" class="header-logo mr-3">
           <h1 class="text-2xl md:text-3xl font-bold">Busca de Escolas</h1>
         </div>
-        <div class="relative w-full md:w-96">
-          <input type="text" id="searchInput" placeholder="Buscar por nome, bairro ou tipo..." class="w-full px-4 py-2 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400">
-          <button id="searchBtn" class="absolute right-0 top-0 h-full px-4 text-blue-600 rounded-r-full bg-white hover:bg-gray-100">
-            <i class="fas fa-search"></i>
-          </button>
-        </div>
-        <!-- Menu Hambúrguer -->
-        <div class="ml-4 relative">
-          <button id="menuBtn" class="flex flex-col justify-center items-center w-10 h-10 rounded hover:bg-blue-600 focus:outline-none">
-            <span class="block w-6 h-0.5 bg-white mb-1"></span>
-            <span class="block w-6 h-0.5 bg-white mb-1"></span>
-            <span class="block w-6 h-0.5 bg-white"></span>
-          </button>
-          <div id="menuDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded shadow-lg z-50">
-            <a href="calendarioemef.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário EMEF</a>
+        <nav aria-label="Busca e menu" class="flex flex-col md:flex-row items-center w-full md:w-auto">
+          <div class="relative w-full md:w-96">
+            <input type="text" id="searchInput" placeholder="Buscar por nome, bairro ou tipo..." class="w-full px-4 py-2 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <button id="searchBtn" class="absolute right-0 top-0 h-full px-4 text-blue-600 rounded-r-full bg-white hover:bg-gray-100">
+              <i class="fas fa-search"></i>
+            </button>
           </div>
-        </div>
+          <div class="ml-4 relative">
+            <button id="menuBtn" class="flex flex-col justify-center items-center w-10 h-10 rounded hover:bg-blue-600 focus:outline-none" aria-label="Abrir menu">
+              <span class="block w-6 h-0.5 bg-white mb-1"></span>
+              <span class="block w-6 h-0.5 bg-white mb-1"></span>
+              <span class="block w-6 h-0.5 bg-white"></span>
+            </button>
+            <div id="menuDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded shadow-lg z-50">
+              <a href="calendarioemef.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário EMEF</a>
+              <a href="calendarioemei.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário EMEI</a>
+              <a href="calendariomaternal.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário Maternal</a>
+              <a href="calendarioeja.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário EJA</a>
+            </div>
+          </div>
+        </nav>
       </div>
     </div>
   </header>
 
-  <!-- Main Content -->
   <main class="container mx-auto px-4 py-8 main-content">
     <div class="flex flex-col lg:flex-row gap-8">
-      <!-- Filters Section -->
-      <div class="w-full lg:w-1/4 bg-white p-6 rounded-lg shadow-md">
+      <section class="w-full lg:w-1/4 bg-white p-6 rounded-lg shadow-md" aria-label="Filtros">
         <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Filtros</h2>
 
         <div class="mb-6">
@@ -104,10 +106,9 @@
         <button id="resetFilters" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md transition">
           Limpar Filtros
         </button>
-      </div>
+      </section>
 
-      <!-- Results Section -->
-      <div class="w-full lg:w-3/4">
+      <section class="w-full lg:w-3/4" aria-label="Resultados">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-xl font-semibold text-gray-800">Escolas Encontradas</h2>
           <div class="text-gray-600">
@@ -115,23 +116,20 @@
           </div>
         </div>
 
-        <!-- School Cards -->
         <div id="schoolsContainer" class="space-y-4">
           <!-- School cards will be dynamically inserted here -->
         </div>
 
-        <!-- Map Section -->
-        <div class="mt-8">
+        <section class="mt-8" aria-label="Mapa das Escolas">
           <h2 class="text-xl font-semibold text-gray-800 mb-4">Localização das Escolas</h2>
           <div id="map" class="map-container bg-gray-200 flex items-center justify-center" style="height: 400px; width: 100%;">
             <p class="text-gray-500">Carregando mapa...</p>
           </div>
-        </div>
-      </div>
+        </section>
+      </section>
     </div>
   </main>
 
-  <!-- Footer -->
   <footer class="bg-gray-800 text-white py-8">
     <div class="container mx-auto px-4">
       <div class="flex flex-col md:flex-row justify-between">
@@ -162,8 +160,8 @@
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="escolas.js"></script>
-  <script src="script.js"></script>
+  <script src="js/escolas.js"></script>
+  <script src="js/script.js"></script>
   <script>
     // Menu hambúrguer toggle
     const menuBtn = document.getElementById('menuBtn');

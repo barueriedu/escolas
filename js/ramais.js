@@ -111,7 +111,7 @@ function fixEncoding(text) {
 // Load and parse CSV data
 async function loadRamaisData() {
   try {
-    const response = await fetch("ramais_SE.CSV");
+    const response = await fetch("csv/ramais_SE.CSV");
     const csvText = await response.text();
     console.log("CSV loaded:", csvText.substring(0, 200));
 
