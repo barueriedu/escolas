@@ -641,38 +641,26 @@ function initializeCalendar() {
 // Run when the page loads
 document.addEventListener("DOMContentLoaded", initializeCalendar);
 
-document.addEventListener("click", function (e) {
-  // Se não clicou em um mês nem em um botão de bimestre
-  if (
-    !e.target.closest(".calendar-month") &&
-    !e.target.classList.contains("bimestre-btn")
-  ) {
-    // Limpa seleção de bimestre
+document.querySelectorAll(".bimestre-btn").forEach((btn) => {
+  btn.addEventListener("click", function () {
     document
       .querySelectorAll(".bimestre-btn")
       .forEach((b) => b.classList.remove("bg-blue-400", "text-white"));
-    // Remove destaques/desfoques/legendas de todos os meses
-    document.querySelectorAll(".calendar-month").forEach((m) => {
-      m.classList.remove("selected", "faded");
-      m.querySelectorAll(".grid > div").forEach((dayDiv) => {
-        dayDiv.style.opacity = "";
-        dayDiv.style.filter = "";
-      });
-      const legend = m.querySelector(".month-events-legend");
-      if (legend) legend.remove();
-    });
+    this.classList.add("bg-blue-400", "text-white");
+    highlightBimestre(this.dataset.bimestre);
+    // Atualiza o número de dias do bimestre no header
+    showBimestreTotalDias(this.dataset.bimestre);
+  });
+});
+// Ao clicar fora dos botões, esconder o campo de dias e mostrar total de dias letivos
+const diasSpan = document.getElementById("bimestreTotalDias");
+document.addEventListener("click", function (e) {
+  if (!e.target.classList.contains("bimestre-btn") && diasSpan) {
+    document.querySelectorAll(".bimestre-btn").forEach(b => b.classList.remove("bg-blue-400", "text-white"));
+    highlightBimestre(null);
+    showBimestreTotalDias(null);
   }
 });
-
-function showBimestreTotalDias(bimestre) {
-  const span = document.getElementById("bimestreTotalDias");
-  if (!span) return;
-  if (!bimestre) {
-    span.textContent = "";
-    return;
-  }
-  span.textContent = `${bimestreRanges[bimestre].dias} dias`;
-}
 
 function highlightBimestre(bimestre) {
   const { start, end } = bimestreRanges[bimestre];
