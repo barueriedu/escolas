@@ -751,10 +751,23 @@ function showBimestreTotalDias(bimestre) {
   const span = document.getElementById("bimestreTotalDias");
   if (!span) return;
   if (!bimestre) {
-    span.textContent = "";
+    // Calcular total de dias letivos do ano
+    let totalLetivos = 0;
+    calendarData.months.forEach((month) => {
+      month.days.forEach((day) => {
+        // Considera letivo se NÃO for feriado nem férias
+        const isLetivo = !day.events.some(
+          (ev) => ev.type === "feriado" || ev.type === "ferias"
+        );
+        if (isLetivo) totalLetivos++;
+      });
+    });
+    span.textContent = `${totalLetivos} dias letivos`;
+    span.classList.remove("hidden");
     return;
   }
   span.textContent = `${bimestreRanges[bimestre].dias} dias`;
+  span.classList.remove("hidden");
 }
 
 function highlightBimestre(bimestre) {
@@ -831,24 +844,170 @@ document.querySelectorAll(".bimestre-btn").forEach((btn) => {
     this.classList.add("bg-blue-400", "text-white");
     highlightBimestre(this.dataset.bimestre);
     // Atualiza o número de dias do bimestre no header
-    const dias = bimestreRanges[this.dataset.bimestre]?.dias;
-    const diasSpan = document.getElementById("bimestreTotalDias");
-    if (diasSpan) {
-      if (dias) {
-        diasSpan.textContent = `${dias} dias`;
-        diasSpan.classList.remove("hidden");
-      } else {
-        diasSpan.textContent = "";
-        diasSpan.classList.add("hidden");
-      }
-    }
+    showBimestreTotalDias(this.dataset.bimestre);
   });
 });
-// Ao clicar fora dos botões, esconder o campo de dias
+// Ao clicar fora dos botões, esconder o campo de dias e mostrar total de dias letivos
 const diasSpan = document.getElementById("bimestreTotalDias");
 document.addEventListener("click", function (e) {
   if (!e.target.classList.contains("bimestre-btn") && diasSpan) {
-    diasSpan.textContent = "";
-    diasSpan.classList.add("hidden");
+    document
+      .querySelectorAll(".bimestre-btn")
+      .forEach((b) => b.classList.remove("bg-blue-400", "text-white"));
+    highlightBimestre(null);
+    showBimestreTotalDias(null);
+  }
+});
+
+// --- Bimestre Highlight ---
+const bimestreRanges = {
+  1: { start: new Date(2025, 1, 10), end: new Date(2025, 3, 30), dias: 53 }, // 10/02 a 30/04
+  2: { start: new Date(2025, 4, 5), end: new Date(2025, 6, 5), dias: 44 }, // 05/05 a 05/07
+  3: { start: new Date(2025, 6, 21), end: new Date(2025, 8, 30), dias: 53 }, // 21/07 a 30/09
+  4: { start: new Date(2025, 9, 1), end: new Date(2025, 11, 19), dias: 55 }, // 01/10 a 19/12
+};
+
+// Legendas dos eventos por bimestre
+const bimestreLegendas = {
+  1: [
+    "Início das Aulas (10/02)",
+    "Semana Pedagógica",
+    "Carnaval",
+    "Feriados: Tiradentes, Sexta-feira Santa, Páscoa",
+  ],
+  2: ["Dia do Trabalho (01/05)", "Corpus Christi", "Festa Junina"],
+  3: ["Retorno das aulas (21/07)", "Feriados do 2º semestre"],
+  4: ["Feriados de Outubro, Novembro e Dezembro", "Encerramento do ano letivo"],
+};
+
+// Aplica destaque/desfoque nos dias do bimestre e mostra legendas por mês
+function highlightBimestre(bimestre) {
+  const { start, end } = bimestreRanges[bimestre];
+  document.querySelectorAll(".calendar-month").forEach((monthDiv) => {
+    monthDiv.classList.remove("selected", "faded");
+    // Remove legendas de mês
+    const legend = monthDiv.querySelector(".month-events-legend");
+    if (legend) legend.remove();
+  });
+  document.querySelectorAll(".calendar-month").forEach((monthDiv, idx) => {
+    let anyInRange = false;
+    let monthEvents = [];
+    monthDiv.querySelectorAll(".grid > div").forEach((dayDiv) => {
+      const day = parseInt(dayDiv.textContent);
+      const monthName = monthDiv.querySelector("h3").textContent;
+      const monthIdx = [
+        "Janeiro",
+        "Fevereiro",
+        "Março",
+        "Abril",
+        "Maio",
+        "Junho",
+        "Julho",
+        "Agosto",
+        "Setembro",
+        "Outubro",
+        "Novembro",
+        "Dezembro",
+      ].indexOf(monthName);
+      // Ignora cabeçalhos
+      if (isNaN(day)) return;
+      const date = new Date(2025, monthIdx, day);
+      if (date >= start && date <= end) {
+        dayDiv.style.opacity = "1";
+        dayDiv.style.filter = "none";
+        anyInRange = true;
+        // Coleta eventos do dia
+        if (dayDiv.title)
+          monthEvents.push(
+            `${day.toString().padStart(2, "0")}/${(monthIdx + 1)
+              .toString()
+              .padStart(2, "0")}: ${dayDiv.title}`
+          );
+      } else {
+        dayDiv.style.opacity = "0.3";
+        dayDiv.style.filter = "blur(1.5px) grayscale(0.7)";
+      }
+    });
+    if (anyInRange) {
+      monthDiv.classList.add("selected");
+      monthDiv.classList.remove("faded");
+      // Adiciona legenda de eventos do mês
+      if (monthEvents.length > 0) {
+        const legendDiv = document.createElement("div");
+        legendDiv.className = "month-events-legend";
+        legendDiv.innerHTML = `<div>${monthEvents
+          .map((ev) => `<div>${ev}</div>`)
+          .join("")}</div>`;
+        monthDiv.appendChild(legendDiv);
+      }
+    } else {
+      monthDiv.classList.add("faded");
+      monthDiv.classList.remove("selected");
+    }
+  });
+}
+
+// Eventos dos botões
+document.querySelectorAll(".bimestre-btn").forEach((btn) => {
+  btn.addEventListener("click", function () {
+    document
+      .querySelectorAll(".bimestre-btn")
+      .forEach((b) => b.classList.remove("bg-blue-400", "text-white"));
+    this.classList.add("bg-blue-400", "text-white");
+    highlightBimestre(this.dataset.bimestre);
+    // Atualiza o número de dias do bimestre no header
+    const dias = bimestreRanges[this.dataset.bimestre]?.dias;
+    const diasSpan = document.getElementById("bimestreTotalDias");
+    if (diasSpan) {
+      diasSpan.textContent = dias ? `${dias} dias` : "";
+    }
+  });
+});
+
+// Limpa o número de dias ao clicar fora dos botões de bimestre
+document.addEventListener("click", function (e) {
+  if (!e.target.classList.contains("bimestre-btn")) {
+    document
+      .querySelectorAll(".bimestre-btn")
+      .forEach((b) => b.classList.remove("bg-blue-400", "text-white"));
+    highlightBimestre(null);
+    // Limpa o número de dias
+    const diasSpan = document.getElementById("bimestreTotalDias");
+    if (diasSpan) diasSpan.textContent = "";
+  }
+});
+
+// --- CORREÇÃO FINAL: Ao clicar em qualquer mês, limpar toda a formatação de bimestre ---
+document.querySelectorAll(".calendar-month").forEach((monthDiv) => {
+  monthDiv.addEventListener("click", function (e) {
+    // Limpa seleção de bimestre
+    document
+      .querySelectorAll(".bimestre-btn")
+      .forEach((b) => b.classList.remove("bg-blue-400", "text-white"));
+    // Remove desfoque de todos os meses e dias
+    document.querySelectorAll(".calendar-month").forEach((m) => {
+      m.classList.remove("selected", "faded");
+      m.querySelectorAll(".grid > div").forEach((dayDiv) => {
+        dayDiv.style.opacity = "";
+        dayDiv.style.filter = "";
+      });
+      // Remove legendas de eventos do bimestre
+      const legend = m.querySelector(".month-events-legend");
+      if (legend) legend.remove();
+    });
+    // Aqui segue a lógica normal de seleção de mês (se já existir no seu código)
+  });
+});
+
+// Menu hambúrguer toggle igual ao index.html
+const menuBtn = document.getElementById("menuBtn");
+const menuDropdown = document.getElementById("menuDropdown");
+document.addEventListener("click", function (e) {
+  if (menuBtn && menuDropdown) {
+    if (menuBtn.contains(e.target)) {
+      menuDropdown.classList.toggle("hidden");
+    } else if (!menuDropdown.contains(e.target)) {
+      menuDropdown.classList.add("hidden");
+    }
   }
 });
