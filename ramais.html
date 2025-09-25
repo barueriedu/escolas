@@ -25,39 +25,39 @@
       </div>
     </div>
   </header>
-  <main class="container mx-auto px-4 py-8 main-content">
-    <section class="mb-6 bg-white p-4 rounded-lg shadow-md" aria-label="Filtros">
-      <div class="flex flex-col md:flex-row gap-4 items-center">
+  <main class="container mx-auto px-2 py-4 main-content compact-main">
+    <section class="mb-4 bg-white p-3 rounded-lg shadow-md compact-section" aria-label="Filtros">
+      <div class="flex flex-col md:flex-row gap-3 items-center">
         <div class="w-full md:w-1/3">
           <label class="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
-          <select id="departmentFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <select id="departmentFilter" class="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
             <option value="">Todos os departamentos</option>
           </select>
         </div>
         <div class="w-full md:w-1/3">
           <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
           <div class="relative">
-            <input type="text" id="searchInput" placeholder="Buscar por nome..." class="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
-            <button id="searchBtn" class="absolute right-0 top-0 h-full px-4 text-blue-600 rounded-r-md bg-white hover:bg-gray-100">
+            <input type="text" id="searchInput" placeholder="Buscar por nome..." class="w-full px-3 py-1 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <button id="searchBtn" class="absolute right-0 top-0 h-full px-3 text-blue-600 rounded-r-md bg-white hover:bg-gray-100">
               <i class="fas fa-search"></i>
             </button>
           </div>
         </div>
         <div class="w-full md:w-1/3 flex items-end">
-          <button id="resetFilters" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md transition">
+          <button id="resetFilters" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-1 px-3 rounded-md transition">
             Limpar Filtros
           </button>
         </div>
       </div>
     </section>
-    <section class="bg-white rounded-lg shadow-md" aria-label="Resultados">
-      <div class="flex justify-between items-center p-4 border-b">
+    <section class="bg-white rounded-lg shadow-md compact-section" aria-label="Resultados">
+      <div class="flex justify-between items-center p-3 border-b">
         <h2 class="text-xl font-semibold text-gray-800">Ramais Encontrados</h2>
         <div class="text-gray-600">
           <span id="resultCount">0</span> resultados
         </div>
       </div>
-      <div id="ramaisContainer" class="p-4">
+      <div id="ramaisContainer" class="p-3 compact-container">
         <!-- Ramais will be dynamically inserted here -->
       </div>
     </section>

@@ -20,6 +20,10 @@ const filterCheckboxes = document.querySelectorAll(".filter-checkbox");
 const neighborhoodFilter = document.getElementById("neighborhoodFilter");
 const resetFilters = document.getElementById("resetFilters");
 const resultCount = document.getElementById("resultCount");
+const exportExcelBtn = document.getElementById("exportExcelBtn");
+
+// Track currently displayed schools
+let currentlyDisplayedSchools = [];
 
 // Populate neighborhood options
 const uniqueNeighborhoods = [
@@ -48,6 +52,51 @@ filterCheckboxes.forEach((checkbox) => {
 neighborhoodFilter.addEventListener("change", filterSchools);
 resetFilters.addEventListener("click", resetAllFilters);
 
+// Export to Excel using currently displayed schools
+if (exportExcelBtn) {
+  exportExcelBtn.addEventListener("click", () => {
+    try {
+      const header = [
+        "Type",
+        "ramal",
+        "whatsapp",
+        "address",
+        "neighborhood",
+        "latitude",
+        "longitude",
+        "director",
+        "directorEmail",
+      ];
+
+      const rows = currentlyDisplayedSchools.map((s) => [
+        s.type ?? "",
+        Array.isArray(s.ramal)
+          ? [...new Set(s.ramal)].join(", ")
+          : s.ramal ?? "",
+        s.whatsapp ?? "",
+        s.address ?? "",
+        s.neighborhood ?? "",
+        s.latitude ?? "",
+        s.longitude ?? "",
+        s.director ?? "",
+        s.directorEmail ?? "",
+      ]);
+
+      const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Escolas");
+
+      const filename = `escolas_${new Date()
+        .toISOString()
+        .replace(/[:.]/g, "-")}.xlsx`;
+      XLSX.writeFile(workbook, filename);
+    } catch (err) {
+      console.error("Erro ao exportar Excel:", err);
+      alert("Não foi possível exportar para Excel.");
+    }
+  });
+}
+
 // Functions
 function displaySchools(schoolsToDisplay) {
   schoolsContainer.innerHTML = "";
@@ -61,10 +110,12 @@ function displaySchools(schoolsToDisplay) {
       </div>
     `;
     resultCount.textContent = "0";
+    currentlyDisplayedSchools = [];
     return;
   }
 
   resultCount.textContent = schoolsToDisplay.length;
+  currentlyDisplayedSchools = schoolsToDisplay;
 
   schoolsToDisplay.forEach((school) => {
     const card = document.createElement("div");
@@ -84,6 +135,22 @@ function displaySchools(schoolsToDisplay) {
               schoolTypeColors[school.type] || "#5072e4"
             }"></i> ${school.address}, ${school.neighborhood}
           </p>
+          ${
+            school.director || school.directorEmail
+              ? `
+          <p class="text-gray-800 flex items-center text-sm mt-1 whitespace-nowrap">
+            <i class="fas fa-user-tie mr-1 text-gray-700"></i>
+            ${school.director ? school.director : ""}
+            ${school.director && school.directorEmail ? " — " : ""}
+            ${
+              school.directorEmail
+                ? `<a href="mailto:${school.directorEmail}" class="text-blue-600 hover:underline">${school.directorEmail}</a>`
+                : ""
+            }
+          </p>
+          `
+              : ""
+          }
         </div>
         <div class="flex gap-2">
           <button class="map-btn px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition flex items-center text-sm">

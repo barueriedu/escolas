@@ -111,7 +111,7 @@ function fixEncoding(text) {
 // Load and parse CSV data
 async function loadRamaisData() {
   try {
-    const response = await fetch("csv/ramais_SE.CSV");
+    const response = await fetch("csv/ramais.csv");
     const csvText = await response.text();
     console.log("CSV loaded:", csvText.substring(0, 200));
 
@@ -230,18 +230,8 @@ function displayRamais(ramaisToDisplay) {
 
     // Cabeçalho da tabela
     table.innerHTML = `
-      <div class="grid grid-cols-5 bg-gray-50 px-1 py-1.5 text-sm font-medium text-gray-700 border-b">
-        <div class="w-50 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center" onclick="handleHeaderClick('SETOR')">
-          Departamento
-          ${
-            window.currentSort.column === "SETOR"
-              ? `<i class="fas fa-sort-${
-                  window.currentSort.direction === "asc" ? "up" : "down"
-                } ml-1"></i>`
-              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
-          }
-        </div>
-        <div class="w-50 ml-5 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center" onclick="handleHeaderClick('NOME')">
+      <div class="grid grid-cols-6 bg-gray-50 px-1 py-1.5 text-sm font-medium text-gray-700 border-b">
+        <div class="w-56 ml-1 cursor-pointer hover:bg-gray-100 px-1 py-1 rounded flex items-center" onclick="handleHeaderClick('NOME')">
           Nome
           ${
             window.currentSort.column === "NOME"
@@ -251,7 +241,10 @@ function displayRamais(ramaisToDisplay) {
               : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
           }
         </div>
-        <div class="w-24 ml-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center" onclick="handleHeaderClick('RAMAL')">
+        <div class="w-80 ml-1 px-1 py-1 rounded flex items-center">
+          Nome completo / e-mail
+        </div>
+        <div class="w-4 ml-16 cursor-pointer hover:bg-gray-100 px-0 py-1 rounded flex items-center" onclick="handleHeaderClick('RAMAL')">
           Ramal
           ${
             window.currentSort.column === "RAMAL"
@@ -261,7 +254,7 @@ function displayRamais(ramaisToDisplay) {
               : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
           }
         </div>
-        <div class="w-24 ml-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center" onclick="handleHeaderClick('DDR')">
+        <div class="w-4 ml-2 cursor-pointer hover:bg-gray-100 px-0 py-1 rounded flex items-center" onclick="handleHeaderClick('DDR')">
           DDR
           ${
             window.currentSort.column === "DDR"
@@ -271,10 +264,20 @@ function displayRamais(ramaisToDisplay) {
               : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
           }
         </div>
-        <div class="w-48 ml-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center" onclick="handleHeaderClick('OBS')">
+        <div class="w-56 cursor-pointer hover:bg-gray-100 px-1 py-1 rounded flex items-center" onclick="handleHeaderClick('SETOR')">
+          Departamento
+          ${
+            window.currentSort.column === "SETOR"
+              ? `<i class="fas fa-sort-${
+                  window.currentSort.direction === "asc" ? "up" : "down"
+                } ml-1"></i>`
+              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
+          }
+        </div>
+        <div class="w-48 ml-1 cursor-pointer hover:bg-gray-100 px-1 py-1 rounded flex items-center" onclick="handleHeaderClick('OBSERVAÇÃO')">
           Observação
           ${
-            window.currentSort.column === "OBS"
+            window.currentSort.column === "OBSERVAÇÃO"
               ? `<i class="fas fa-sort-${
                   window.currentSort.direction === "asc" ? "up" : "down"
                 } ml-1"></i>`
@@ -288,26 +291,38 @@ function displayRamais(ramaisToDisplay) {
     sortedRamais.forEach((ramal) => {
       const row = document.createElement("div");
       row.className =
-        "grid grid-cols-5 px-1 py-1 text-sm border-b border-gray-100 hover:bg-gray-50";
+        "grid grid-cols-6 px-1 py-1 text-sm border-b border-gray-100 hover:bg-gray-50";
       row.innerHTML = `
-        <div class="font-medium text-blue-800 w-50">${ramal.SETOR}</div>
-        <div class="font-medium text-gray-800 truncate w-50 ml-5">${
+        <div class="font-medium text-gray-800 truncate w-56 ml-1">${
           ramal.NOME
         }</div>
-        <div class="text-gray-600 whitespace-nowrap w-24 ml-2">
+        <div class="text-gray-700 w-80 ml-1">
+          ${
+            ramal["NOME COMPLETO"]
+              ? `<div class="font-medium text-gray-800">${ramal["NOME COMPLETO"]}</div>`
+              : "-"
+          }
+          ${
+            ramal["E-MAIL"]
+              ? `<div class="text-blue-600"><a href="mailto:${ramal["E-MAIL"]}" class="hover:underline">${ramal["E-MAIL"]}</a></div>`
+              : ""
+          }
+        </div>
+        <div class="text-gray-600 whitespace-nowrap w-4 ml-16">
           <i class="fas fa-phone mr-1 text-blue-500"></i>${ramal.RAMAL}
         </div>
-        <div class="text-gray-600 whitespace-nowrap w-24 ml-2">
+        <div class="text-gray-600 whitespace-nowrap w-4 ml-2">
           ${
             ramal.DDR
               ? `<i class="fas fa-phone-alt mr-1 text-gray-600"></i>${ramal.DDR}`
               : "-"
           }
         </div>
-        <div class="text-gray-600 truncate w-48 ml-2">
+        <div class="font-medium text-blue-800 w-56">${ramal.SETOR}</div>
+        <div class="text-gray-600 truncate w-48 ml-1">
           ${
-            ramal.OBS
-              ? `<i class="fas fa-info-circle mr-1"></i>${ramal.OBS}`
+            ramal.OBSERVAÇÃO
+              ? `<i class="fas fa-info-circle mr-1"></i>${ramal.OBSERVAÇÃO}`
               : "-"
           }
         </div>
@@ -323,18 +338,8 @@ function displayRamais(ramaisToDisplay) {
 
     // Cabeçalho
     grid.innerHTML = `
-      <div class="grid grid-cols-5 bg-gray-50 px-1 py-1.5 text-sm font-medium text-gray-700 border-b">
-        <div class="w-50 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center" onclick="handleHeaderClick('SETOR')">
-          Departamento
-          ${
-            window.currentSort.column === "SETOR"
-              ? `<i class="fas fa-sort-${
-                  window.currentSort.direction === "asc" ? "up" : "down"
-                } ml-1"></i>`
-              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
-          }
-        </div>
-        <div class="w-50 ml-5 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center" onclick="handleHeaderClick('NOME')">
+      <div class="grid grid-cols-6 bg-gray-50 px-1 py-1.5 text-sm font-medium text-gray-700 border-b">
+        <div class="w-56 ml-1 cursor-pointer hover:bg-gray-100 px-1 py-1 rounded flex items-center" onclick="handleHeaderClick('NOME')">
           Nome
           ${
             window.currentSort.column === "NOME"
@@ -344,7 +349,10 @@ function displayRamais(ramaisToDisplay) {
               : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
           }
         </div>
-        <div class="w-24 ml-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center" onclick="handleHeaderClick('RAMAL')">
+        <div class="w-80 ml-1 px-1 py-1 rounded flex items-center">
+          Nome completo / e-mail
+        </div>
+        <div class="w-4 ml-8 cursor-pointer hover:bg-gray-100 px-0 py-1 rounded flex items-center" onclick="handleHeaderClick('RAMAL')">
           Ramal
           ${
             window.currentSort.column === "RAMAL"
@@ -354,7 +362,7 @@ function displayRamais(ramaisToDisplay) {
               : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
           }
         </div>
-        <div class="w-24 ml-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center" onclick="handleHeaderClick('DDR')">
+        <div class="w-4 ml-1 cursor-pointer hover:bg-gray-100 px-0 py-1 rounded flex items-center" onclick="handleHeaderClick('DDR')">
           DDR
           ${
             window.currentSort.column === "DDR"
@@ -364,10 +372,20 @@ function displayRamais(ramaisToDisplay) {
               : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
           }
         </div>
-        <div class="w-48 ml-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded flex items-center" onclick="handleHeaderClick('OBS')">
+        <div class="w-56 cursor-pointer hover:bg-gray-100 px-1 py-1 rounded flex items-center" onclick="handleHeaderClick('SETOR')">
+          Departamento
+          ${
+            window.currentSort.column === "SETOR"
+              ? `<i class="fas fa-sort-${
+                  window.currentSort.direction === "asc" ? "up" : "down"
+                } ml-1"></i>`
+              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
+          }
+        </div>
+        <div class="w-48 ml-1 cursor-pointer hover:bg-gray-100 px-1 py-1 rounded flex items-center" onclick="handleHeaderClick('OBSERVAÇÃO')">
           Observação
           ${
-            window.currentSort.column === "OBS"
+            window.currentSort.column === "OBSERVAÇÃO"
               ? `<i class="fas fa-sort-${
                   window.currentSort.direction === "asc" ? "up" : "down"
                 } ml-1"></i>`
@@ -381,32 +399,44 @@ function displayRamais(ramaisToDisplay) {
     sortedRamais.forEach((ramal) => {
       const row = document.createElement("div");
       row.className =
-        "grid grid-cols-5 px-1 py-1 text-sm border-b border-gray-100 hover:bg-gray-50";
+        "grid grid-cols-6 px-1 py-1 text-sm border-b border-gray-100 hover:bg-gray-50";
       row.innerHTML = `
-        <div class="font-medium text-blue-800 w-50">
+        <div class="font-medium text-gray-800 truncate w-56 ml-1">${
+          ramal.NOME
+        }</div>
+        <div class="text-gray-700 w-80 ml-1">
           ${
-            !selectedDepartment
-              ? `<span class="inline-block px-0.5 py-0 bg-blue-100 text-blue-800 rounded-full text-sm whitespace-nowrap">${ramal.SETOR}</span>`
+            ramal["NOME COMPLETO"]
+              ? `<div class="font-medium text-gray-800">${ramal["NOME COMPLETO"]}</div>`
+              : "-"
+          }
+          ${
+            ramal["E-MAIL"]
+              ? `<div class="text-blue-600"><a href="mailto:${ramal["E-MAIL"]}" class="hover:underline">${ramal["E-MAIL"]}</a></div>`
               : ""
           }
         </div>
-        <div class="font-medium text-gray-800 truncate w-50 ml-5">${
-          ramal.NOME
-        }</div>
-        <div class="text-gray-600 whitespace-nowrap w-24 ml-2">
+        <div class="text-gray-600 whitespace-nowrap w-4 ml-8">
           <i class="fas fa-phone mr-1 text-blue-500"></i>${ramal.RAMAL}
         </div>
-        <div class="text-gray-600 whitespace-nowrap w-24 ml-2">
+        <div class="text-gray-600 whitespace-nowrap w-4 ml-1">
           ${
             ramal.DDR
               ? `<i class="fas fa-phone-alt mr-1 text-gray-600"></i>${ramal.DDR}`
               : "-"
           }
         </div>
-        <div class="text-gray-600 truncate w-48 ml-2">
+        <div class="font-medium text-blue-800 w-56">
           ${
-            ramal.OBS
-              ? `<i class="fas fa-info-circle mr-1"></i>${ramal.OBS}`
+            !selectedDepartment
+              ? `<span class="inline-block px-0.5 py-0 bg-blue-100 text-blue-800 rounded-full text-sm whitespace-nowrap">${ramal.SETOR}</span>`
+              : ""
+          }
+        </div>
+        <div class="text-gray-600 truncate w-48 ml-1">
+          ${
+            ramal.OBSERVAÇÃO
+              ? `<i class="fas fa-info-circle mr-1"></i>${ramal.OBSERVAÇÃO}`
               : "-"
           }
         </div>
