@@ -1,6 +1,7 @@
 let map;
 const schoolsData = [];
 let currentlyDisplayedSchools = [];
+let schoolsDataPromise = null;
 
 const schoolTypeColors = {
   EMEF: "#5072e4",
@@ -138,74 +139,101 @@ function populateNeighborhoodOptions() {
 }
 
 async function loadSchoolsData() {
-  try {
-    const response = await fetch("csv/escolasNovo.csv");
-    const buffer = await response.arrayBuffer();
-    const csvText = new TextDecoder("latin1").decode(buffer);
-    const rows = parseSemicolonCsv(csvText);
-    const headerIndex = rows.findIndex((row) =>
-      normalizeText(row[0]).toUpperCase().startsWith("ESCOLA")
-    );
+  if (schoolsData.length > 0) return schoolsData;
+  if (schoolsDataPromise) return schoolsDataPromise;
 
-    if (headerIndex < 0) {
-      throw new Error("Cabecalho do CSV nao encontrado.");
+  schoolsDataPromise = (async () => {
+    try {
+      const response = await fetch("csv/escolasNovo.csv");
+      const buffer = await response.arrayBuffer();
+      const csvText = new TextDecoder("latin1").decode(buffer);
+      const rows = parseSemicolonCsv(csvText);
+      const headerIndex = rows.findIndex((row) =>
+        normalizeText(row[0]).toUpperCase().startsWith("ESCOLA")
+      );
+
+      if (headerIndex < 0) {
+        throw new Error("Cabecalho do CSV nao encontrado.");
+      }
+
+      const dataRows = rows.slice(headerIndex + 1);
+      schoolsData.length = 0;
+
+      dataRows.forEach((row) => {
+        const schoolLabel = row[0] || "";
+        if (!schoolLabel.trim()) return;
+
+        const type = inferSchoolType(schoolLabel);
+        const school = {
+          type,
+          rawName: schoolLabel,
+          name: cleanSchoolName(schoolLabel, type),
+          phones: parsePhones(row[1]).concat(parsePhones(row[2])),
+          whatsapp: row[3] || "",
+          schoolEmail: row[4] || "",
+          address: row[5] || "",
+          neighborhood: row[6] || "",
+          mapsUrl: row[7] || "",
+          coordinatorName: row[8] || "",
+          coordinatorRamal: row[9] || "",
+          coordinatorEmail: row[10] || "",
+          director: row[11] || "",
+          directorPhone: row[12] || "",
+          directorEmail: row[13] || "",
+          supervisorName: row[14] || "",
+          supervisorPhone: row[15] || "",
+          supervisorEmail: row[16] || "",
+          supportName: row[17] || "",
+          supportPhone: row[18] || "",
+          supportRamal: row[19] || "",
+          supportEmail: row[20] || "",
+        };
+
+        school.ramal = [
+          ...parseRamais(row[2]),
+          ...parseRamais(row[9]),
+          ...parseRamais(row[19]),
+        ];
+
+        schoolsData.push(school);
+      });
+
+      schoolsData.sort((a, b) => a.name.localeCompare(b.name));
+      return schoolsData;
+    } finally {
+      schoolsDataPromise = null;
     }
+  })();
 
-    const dataRows = rows.slice(headerIndex + 1);
-    schoolsData.length = 0;
-
-    dataRows.forEach((row) => {
-      const schoolLabel = row[0] || "";
-      if (!schoolLabel.trim()) return;
-
-      const type = inferSchoolType(schoolLabel);
-      const school = {
-        type,
-        rawName: schoolLabel,
-        name: cleanSchoolName(schoolLabel, type),
-        phones: parsePhones(row[1]).concat(parsePhones(row[2])),
-        whatsapp: row[3] || "",
-        schoolEmail: row[4] || "",
-        address: row[5] || "",
-        neighborhood: row[6] || "",
-        mapsUrl: row[7] || "",
-        coordinatorName: row[8] || "",
-        coordinatorRamal: row[9] || "",
-        coordinatorEmail: row[10] || "",
-        director: row[11] || "",
-        directorPhone: row[12] || "",
-        directorEmail: row[13] || "",
-        supervisorName: row[14] || "",
-        supervisorPhone: row[15] || "",
-        supervisorEmail: row[16] || "",
-        supportName: row[17] || "",
-        supportPhone: row[18] || "",
-        supportRamal: row[19] || "",
-        supportEmail: row[20] || "",
-      };
-
-      school.ramal = [
-        ...parseRamais(row[2]),
-        ...parseRamais(row[9]),
-        ...parseRamais(row[19]),
-      ];
-
-      schoolsData.push(school);
-    });
-
-    schoolsData.sort((a, b) => a.name.localeCompare(b.name));
-    populateNeighborhoodOptions();
-    filterSchools();
+  try {
+    const loadedSchools = await schoolsDataPromise;
+    if (schoolsContainer && neighborhoodFilter) {
+      populateNeighborhoodOptions();
+      filterSchools();
+    }
+    return loadedSchools;
   } catch (error) {
     console.error("Erro ao carregar escolas:", error);
-    schoolsContainer.innerHTML = `
-      <div class="bg-white p-6 rounded-lg shadow-md text-center">
-        <i class="fas fa-exclamation-circle text-5xl text-red-400 mb-4"></i>
-        <h3 class="text-xl font-semibold text-gray-700 mb-2">Erro ao carregar dados</h3>
-        <p class="text-gray-500">Nao foi possivel carregar o arquivo csv/escolasNovo.csv.</p>
-      </div>
-    `;
+    if (schoolsContainer) {
+      schoolsContainer.innerHTML = `
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+          <i class="fas fa-exclamation-circle text-5xl text-red-400 mb-4"></i>
+          <h3 class="text-xl font-semibold text-gray-700 mb-2">Erro ao carregar dados</h3>
+          <p class="text-gray-500">Nao foi possivel carregar o arquivo csv/escolasNovo.csv.</p>
+        </div>
+      `;
+    }
+    throw error;
   }
+}
+
+function findSchoolByName(name) {
+  const target = normalizeText(name).toLowerCase();
+  return schoolsData.find((school) => {
+    const baseName = normalizeText(school.name).toLowerCase();
+    const rawName = normalizeText(school.rawName).toLowerCase();
+    return baseName === target || rawName === target;
+  });
 }
 
 function displaySchools(schoolsToDisplay) {
@@ -378,15 +406,17 @@ if (exportExcelBtn) {
   });
 }
 
-searchBtn.addEventListener("click", filterSchools);
-searchInput.addEventListener("keyup", (e) => {
-  if (e.key === "Enter") filterSchools();
-});
-filterCheckboxes.forEach((checkbox) =>
-  checkbox.addEventListener("change", filterSchools)
-);
-neighborhoodFilter.addEventListener("change", filterSchools);
-resetFilters.addEventListener("click", resetAllFilters);
+if (searchBtn && searchInput && neighborhoodFilter && resetFilters) {
+  searchBtn.addEventListener("click", filterSchools);
+  searchInput.addEventListener("keyup", (e) => {
+    if (e.key === "Enter") filterSchools();
+  });
+  filterCheckboxes.forEach((checkbox) =>
+    checkbox.addEventListener("change", filterSchools)
+  );
+  neighborhoodFilter.addEventListener("change", filterSchools);
+  resetFilters.addEventListener("click", resetAllFilters);
+}
 
 document.addEventListener("click", (e) => {
   if (e.target.classList.contains("map-btn") || e.target.closest(".map-btn")) {
@@ -397,6 +427,12 @@ document.addEventListener("click", (e) => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(initMap, 100);
-  loadSchoolsData();
+  if (schoolsContainer) {
+    setTimeout(initMap, 100);
+    loadSchoolsData();
+  }
 });
+
+window.loadSchoolsData = loadSchoolsData;
+window.getSchoolsData = () => schoolsData;
+window.findSchoolByName = findSchoolByName;

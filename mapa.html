@@ -148,46 +148,83 @@
       }
     });
 
-    document.addEventListener('DOMContentLoaded', function () {
+    function getCoordinatesFromGoogleMapsUrl(url) {
+      if (!url) return null;
+
+      const atMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+      if (atMatch) {
+        return { lat: Number(atMatch[1]), lng: Number(atMatch[2]) };
+      }
+
+      const encodedMatch = url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+      if (encodedMatch) {
+        return { lat: Number(encodedMatch[1]), lng: Number(encodedMatch[2]) };
+      }
+
+      return null;
+    }
+
+    function showUnavailableMapMessage(school) {
+      const mapsButton = school && school.mapsUrl
+        ? `<a href="${school.mapsUrl}" target="_blank" rel="noopener noreferrer" class="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Abrir no Google Maps</a>`
+        : '';
+
+      document.getElementById('map').innerHTML = `
+        <div class="error-message">
+          <p>Localização não disponível no mapa interno.</p>
+          <p>Use o link do Google Maps para abrir a unidade.</p>
+          ${mapsButton}
+        </div>
+      `;
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
       const urlParams = new URLSearchParams(window.location.search);
-      const schoolName = decodeURIComponent(urlParams.get('name'));
-      console.log('Looking for school:', schoolName);
-      const school = schools.find(s => s.name === schoolName);
-      console.log('Found school:', school);
+      const schoolNameParam = urlParams.get('name') || '';
+      const schoolName = decodeURIComponent(schoolNameParam);
 
-      document.getElementById('schoolName').textContent = schoolName;
-      if (school) {
-        document.getElementById('schoolType').textContent = school.type;
-        document.getElementById('schoolAddress').textContent = `${school.address}, ${school.neighborhood}`;
+      if (typeof window.loadSchoolsData === 'function') {
+        await window.loadSchoolsData();
       }
 
-      if (school && school.latitude && school.longitude) {
-        console.log('Using coordinates:', school.latitude, school.longitude);
-        const map = L.map('map').setView([school.latitude, school.longitude], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+      const school = typeof window.findSchoolByName === 'function'
+        ? window.findSchoolByName(schoolName)
+        : null;
 
-        const marker = L.marker([school.latitude, school.longitude]).addTo(map);
-        let popupContent = `
-          <strong>${school.name}</strong><br>
-          ${school.address}<br>
-          ${school.neighborhood}
-        `;
-        if (school.phones && school.phones.length > 0) {
-          popupContent += `<br>Telefones: ${school.phones.join(', ')}`;
-        }
-        marker.bindPopup(popupContent);
-      } else {
-        console.log('No coordinates found for school');
-        document.getElementById('map').innerHTML = `
-          <div class="error-message">
-            <p>Localização não disponível</p>
-            <p>Não foi possível encontrar as coordenadas para esta escola.</p>
-            <a href="index.html">Voltar para a página inicial</a>
-          </div>
-        `;
+      document.getElementById('schoolName').textContent = schoolName || 'Escola não informada';
+
+      if (!school) {
+        showUnavailableMapMessage(null);
+        return;
       }
+
+      document.getElementById('schoolType').textContent = school.type || '';
+      document.getElementById('schoolAddress').textContent = `${school.address || ''}${school.neighborhood ? `, ${school.neighborhood}` : ''}`;
+
+      const coordinates = getCoordinatesFromGoogleMapsUrl(school.mapsUrl);
+      if (!coordinates) {
+        showUnavailableMapMessage(school);
+        return;
+      }
+
+      const map = L.map('map').setView([coordinates.lat, coordinates.lng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      const marker = L.marker([coordinates.lat, coordinates.lng]).addTo(map);
+      let popupContent = `
+        <strong>${school.name}</strong><br>
+        ${school.address || ''}<br>
+        ${school.neighborhood || ''}
+      `;
+      if (school.phones && school.phones.length > 0) {
+        popupContent += `<br>Telefones: ${school.phones.join(', ')}`;
+      }
+      if (school.mapsUrl) {
+        popupContent += `<br><a href="${school.mapsUrl}" target="_blank" rel="noopener noreferrer">Abrir Google Maps</a>`;
+      }
+      marker.bindPopup(popupContent).openPopup();
     });
   </script>
 </body>
