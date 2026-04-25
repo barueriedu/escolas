@@ -1,4 +1,3 @@
-// DOM elements
 const ramaisContainer = document.getElementById("ramaisContainer");
 const searchInput = document.getElementById("searchInput");
 const searchBtn = document.getElementById("searchBtn");
@@ -7,185 +6,140 @@ const resetFilters = document.getElementById("resetFilters");
 const resultCount = document.getElementById("resultCount");
 
 let ramaisData = [];
+window.currentSort = { column: "departamento", direction: "asc" };
 
-// Add sorting state
-window.currentSort = {
-  column: "SETOR",
-  direction: "asc",
-};
+function parseSemicolonCsv(csvText) {
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let inQuotes = false;
 
-// Function to normalize special characters
-function normalizeText(text) {
-  if (!text) return "";
+  for (let i = 0; i < csvText.length; i += 1) {
+    const char = csvText[i];
+    const next = csvText[i + 1];
 
-  // Mapeamento direto de caracteres problemáticos
-  const charMap = {
-    Ã: "A",
-    Á: "A",
-    À: "A",
-    Â: "A",
-    Ä: "A",
-    É: "E",
-    Ê: "E",
-    È: "E",
-    Ë: "E",
-    Í: "I",
-    Î: "I",
-    Ì: "I",
-    Ï: "I",
-    Ó: "O",
-    Ô: "O",
-    Ò: "O",
-    Õ: "O",
-    Ö: "O",
-    Ú: "U",
-    Û: "U",
-    Ù: "U",
-    Ü: "U",
-    Ç: "C",
-    Ñ: "N",
-    ã: "a",
-    á: "a",
-    à: "a",
-    â: "a",
-    ä: "a",
-    é: "e",
-    ê: "e",
-    è: "e",
-    ë: "e",
-    í: "i",
-    î: "i",
-    ì: "i",
-    ï: "i",
-    ó: "o",
-    ô: "o",
-    ò: "o",
-    õ: "o",
-    ö: "o",
-    ú: "u",
-    û: "u",
-    ù: "u",
-    ü: "u",
-    ç: "c",
-    ñ: "n",
-  };
+    if (char === '"') {
+      if (inQuotes && next === '"') {
+        cell += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+    if (char === ";" && !inQuotes) {
+      row.push(cell.trim());
+      cell = "";
+      continue;
+    }
+    if ((char === "\n" || char === "\r") && !inQuotes) {
+      if (char === "\r" && next === "\n") i += 1;
+      row.push(cell.trim());
+      const hasData = row.some((item) => item !== "");
+      if (hasData) rows.push(row);
+      row = [];
+      cell = "";
+      continue;
+    }
+    cell += char;
+  }
 
-  return text.replace(/[À-ÿ]/g, (char) => charMap[char] || char);
+  if (cell || row.length) {
+    row.push(cell.trim());
+    const hasData = row.some((item) => item !== "");
+    if (hasData) rows.push(row);
+  }
+
+  return rows;
 }
 
-// Function to decode HTML entities
-function decodeHTMLEntities(text) {
-  const textarea = document.createElement("textarea");
-  textarea.innerHTML = text;
-  return textarea.value;
+function normalizeText(value) {
+  return (value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\x20-\x7E]/g, "")
+    .toLowerCase();
 }
 
-// Function to fix encoding issues
-function fixEncoding(text) {
-  // Mapeamento de caracteres mal codificados
-  const encodingMap = {
-    "": "Â",
-    "": "É",
-    "": "Ê",
-    "": "Í",
-    "": "Ó",
-    "": "Ô",
-    "": "Õ",
-    "": "Ú",
-    "": "á",
-    "": "â",
-    "": "ã",
-    "": "é",
-    "": "ê",
-    "": "í",
-    "": "ó",
-    "": "ô",
-    "": "õ",
-    "": "ú",
-    "": "ç",
-  };
-
-  return text.replace(/[^\x00-\x7F]/g, (char) => encodingMap[char] || char);
+function normalizeDepartment(value) {
+  return (value || "").replace(/\s+/g, " ").trim();
 }
 
-// Load and parse CSV data
 async function loadRamaisData() {
   try {
-    const response = await fetch("csv/ramais.csv");
-    const csvText = await response.text();
-    console.log("CSV loaded:", csvText.substring(0, 200));
+    const response = await fetch("csv/ramaisNovo.csv");
+    const buffer = await response.arrayBuffer();
+    const csvText = new TextDecoder("latin1").decode(buffer);
+    const rows = parseSemicolonCsv(csvText);
+    const headerIndex = rows.findIndex((row) =>
+      normalizeText(row[0]).includes("nome")
+    );
 
-    const rows = csvText.split("\n").map((row) => row.split(";"));
-    const headers = rows[0];
-    console.log("Headers:", headers);
-
-    ramaisData = rows.slice(1).map((row) => {
-      const ramal = {};
-      headers.forEach((header, index) => {
-        const value = row[index]?.trim() || "";
-        ramal[header.trim()] = decodeHTMLEntities(fixEncoding(value));
-      });
-      return ramal;
-    });
-
-    console.log("First few ramais:", ramaisData.slice(0, 3));
-
-    // Populate department filter
-    const departments = [...new Set(ramaisData.map((ramal) => ramal.SETOR))]
-      .filter(Boolean)
-      .sort();
-    console.log("Departments found:", departments);
-
-    // Clear existing options except the first one
-    while (departmentFilter.options.length > 1) {
-      departmentFilter.remove(1);
+    if (headerIndex < 0) {
+      throw new Error("Cabecalho do arquivo nao encontrado.");
     }
 
-    departments.forEach((department) => {
-      if (department) {
-        const option = document.createElement("option");
-        option.value = department;
-        option.textContent = department;
-        departmentFilter.appendChild(option);
-      }
-    });
+    ramaisData = rows.slice(headerIndex + 1).map((row) => ({
+      nome: row[0] || "",
+      departamento: normalizeDepartment(row[1] || ""),
+      ramal: row[2] || "",
+      ddr: row[3] || "",
+      observacao: row[4] || "",
+      email: row[5] || "",
+    })).filter((row) => row.nome || row.departamento || row.ramal || row.email);
 
-    // Initial display
-    displayRamais(ramaisData);
+    populateDepartmentFilter();
+    filterRamais();
   } catch (error) {
-    console.error("Error loading ramais data:", error);
+    console.error("Erro ao carregar dados de ramais:", error);
     ramaisContainer.innerHTML = `
       <div class="bg-white p-6 rounded-lg shadow-md text-center">
         <i class="fas fa-exclamation-circle text-5xl text-red-400 mb-4"></i>
         <h3 class="text-xl font-semibold text-gray-700 mb-2">Erro ao carregar dados</h3>
-        <p class="text-gray-500">Não foi possível carregar os dados dos ramais</p>
+        <p class="text-gray-500">Nao foi possivel ler o arquivo csv/ramaisNovo.csv.</p>
       </div>
     `;
   }
 }
 
-// Function to sort ramais data
-window.sortRamais = function (data, column, direction) {
+function populateDepartmentFilter() {
+  while (departmentFilter.options.length > 1) {
+    departmentFilter.remove(1);
+  }
+
+  const departments = [
+    ...new Set(ramaisData.map((item) => item.departamento).filter(Boolean)),
+  ].sort((a, b) => a.localeCompare(b));
+
+  departments.forEach((department) => {
+    const option = document.createElement("option");
+    option.value = department;
+    option.textContent = department;
+    departmentFilter.appendChild(option);
+  });
+}
+
+function sortRamais(data, column, direction) {
   return [...data].sort((a, b) => {
     let valueA = a[column] || "";
     let valueB = b[column] || "";
 
-    // Handle numeric values for RAMAL and DDR
-    if (column === "RAMAL" || column === "DDR") {
-      valueA = parseInt(valueA) || 0;
-      valueB = parseInt(valueB) || 0;
+    if (column === "ramal" || column === "ddr") {
+      const numA = Number((valueA.match(/\d+/) || ["0"])[0]);
+      const numB = Number((valueB.match(/\d+/) || ["0"])[0]);
+      return direction === "asc" ? numA - numB : numB - numA;
     }
 
-    if (direction === "asc") {
-      return valueA > valueB ? 1 : -1;
-    } else {
-      return valueA < valueB ? 1 : -1;
-    }
+    valueA = valueA.toString().toLowerCase();
+    valueB = valueB.toString().toLowerCase();
+    if (valueA === valueB) return 0;
+    return direction === "asc"
+      ? valueA.localeCompare(valueB)
+      : valueB.localeCompare(valueA);
   });
-};
+}
 
-// Function to handle header click
-function handleHeaderClick(column) {
+window.handleHeaderClick = function (column) {
   if (window.currentSort.column === column) {
     window.currentSort.direction =
       window.currentSort.direction === "asc" ? "desc" : "asc";
@@ -194,303 +148,101 @@ function handleHeaderClick(column) {
     window.currentSort.direction = "asc";
   }
   filterRamais();
+};
+
+function sortIcon(column) {
+  if (window.currentSort.column !== column) {
+    return '<i class="fas fa-sort ml-1 text-gray-400"></i>';
+  }
+  return `<i class="fas fa-sort-${window.currentSort.direction === "asc" ? "up" : "down"} ml-1"></i>`;
 }
 
-// Display ramais
 function displayRamais(ramaisToDisplay) {
   ramaisContainer.innerHTML = "";
-  const selectedDepartment = departmentFilter.value;
-  const hasSearchTerm = searchInput.value.trim() !== "";
 
   if (ramaisToDisplay.length === 0) {
     ramaisContainer.innerHTML = `
       <div class="bg-white p-6 rounded-lg shadow-md text-center">
         <i class="fas fa-phone text-5xl text-gray-400 mb-4"></i>
         <h3 class="text-xl font-semibold text-gray-700 mb-2">Nenhum ramal encontrado</h3>
-        <p class="text-gray-500">Tente ajustar seus filtros de busca</p>
+        <p class="text-gray-500">Ajuste os filtros para continuar.</p>
       </div>
     `;
     resultCount.textContent = "0";
     return;
   }
 
-  resultCount.textContent = ramaisToDisplay.length;
-
-  // Sort the data
-  const sortedRamais = window.sortRamais(
+  const sortedRamais = sortRamais(
     ramaisToDisplay,
     window.currentSort.column,
     window.currentSort.direction
   );
+  resultCount.textContent = String(sortedRamais.length);
 
-  if (hasSearchTerm) {
-    // Layout tabular para resultados de busca
-    const table = document.createElement("div");
-    table.className = "bg-white rounded-lg overflow-hidden";
+  const table = document.createElement("div");
+  table.className = "overflow-auto rounded-lg border border-gray-100";
+  table.innerHTML = `
+    <table class="min-w-full text-sm">
+      <thead class="bg-gray-50 text-gray-700">
+        <tr>
+          <th class="text-left px-3 py-2 cursor-pointer" onclick="handleHeaderClick('nome')">Nome ${sortIcon("nome")}</th>
+          <th class="text-left px-3 py-2 cursor-pointer" onclick="handleHeaderClick('departamento')">Departamento/Setor ${sortIcon("departamento")}</th>
+          <th class="text-left px-3 py-2 cursor-pointer" onclick="handleHeaderClick('ramal')">Ramal ${sortIcon("ramal")}</th>
+          <th class="text-left px-3 py-2 cursor-pointer" onclick="handleHeaderClick('ddr')">DDR ${sortIcon("ddr")}</th>
+          <th class="text-left px-3 py-2 cursor-pointer" onclick="handleHeaderClick('observacao')">Observacao ${sortIcon("observacao")}</th>
+          <th class="text-left px-3 py-2 cursor-pointer" onclick="handleHeaderClick('email')">E-mail ${sortIcon("email")}</th>
+        </tr>
+      </thead>
+      <tbody id="ramaisRows"></tbody>
+    </table>
+  `;
 
-    // Cabeçalho da tabela
-    table.innerHTML = `
-      <div class="grid grid-cols-6 bg-gray-50 px-1 py-1.5 text-sm font-medium text-gray-700 border-b">
-        <div class="w-56 ml-1 cursor-pointer hover:bg-gray-100 px-1 py-1 rounded flex items-center" onclick="handleHeaderClick('NOME')">
-          Nome
-          ${
-            window.currentSort.column === "NOME"
-              ? `<i class="fas fa-sort-${
-                  window.currentSort.direction === "asc" ? "up" : "down"
-                } ml-1"></i>`
-              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
-          }
-        </div>
-        <div class="w-80 ml-1 px-1 py-1 rounded flex items-center">
-          Nome completo / e-mail
-        </div>
-        <div class="w-4 ml-16 cursor-pointer hover:bg-gray-100 px-0 py-1 rounded flex items-center" onclick="handleHeaderClick('RAMAL')">
-          Ramal
-          ${
-            window.currentSort.column === "RAMAL"
-              ? `<i class="fas fa-sort-${
-                  window.currentSort.direction === "asc" ? "up" : "down"
-                } ml-1"></i>`
-              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
-          }
-        </div>
-        <div class="w-4 ml-2 cursor-pointer hover:bg-gray-100 px-0 py-1 rounded flex items-center" onclick="handleHeaderClick('DDR')">
-          DDR
-          ${
-            window.currentSort.column === "DDR"
-              ? `<i class="fas fa-sort-${
-                  window.currentSort.direction === "asc" ? "up" : "down"
-                } ml-1"></i>`
-              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
-          }
-        </div>
-        <div class="w-56 cursor-pointer hover:bg-gray-100 px-1 py-1 rounded flex items-center" onclick="handleHeaderClick('SETOR')">
-          Departamento
-          ${
-            window.currentSort.column === "SETOR"
-              ? `<i class="fas fa-sort-${
-                  window.currentSort.direction === "asc" ? "up" : "down"
-                } ml-1"></i>`
-              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
-          }
-        </div>
-        <div class="w-48 ml-1 cursor-pointer hover:bg-gray-100 px-1 py-1 rounded flex items-center" onclick="handleHeaderClick('OBSERVAÇÃO')">
-          Observação
-          ${
-            window.currentSort.column === "OBSERVAÇÃO"
-              ? `<i class="fas fa-sort-${
-                  window.currentSort.direction === "asc" ? "up" : "down"
-                } ml-1"></i>`
-              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
-          }
-        </div>
-      </div>
+  const tbody = table.querySelector("#ramaisRows");
+  sortedRamais.forEach((ramal) => {
+    const tr = document.createElement("tr");
+    tr.className = "border-t hover:bg-gray-50";
+    tr.innerHTML = `
+      <td class="px-3 py-2 font-medium text-gray-800">${ramal.nome || "-"}</td>
+      <td class="px-3 py-2">${ramal.departamento || "-"}</td>
+      <td class="px-3 py-2">${ramal.ramal || "-"}</td>
+      <td class="px-3 py-2">${ramal.ddr || "-"}</td>
+      <td class="px-3 py-2">${ramal.observacao || "-"}</td>
+      <td class="px-3 py-2">${ramal.email ? `<a href="mailto:${ramal.email}" class="text-blue-600 hover:underline">${ramal.email}</a>` : "-"}</td>
     `;
-
-    // Linhas da tabela
-    sortedRamais.forEach((ramal) => {
-      const row = document.createElement("div");
-      row.className =
-        "grid grid-cols-6 px-1 py-1 text-sm border-b border-gray-100 hover:bg-gray-50";
-      row.innerHTML = `
-        <div class="font-medium text-gray-800 truncate w-56 ml-1">${
-          ramal.NOME
-        }</div>
-        <div class="text-gray-700 w-80 ml-1">
-          ${
-            ramal["NOME COMPLETO"]
-              ? `<div class="font-medium text-gray-800">${ramal["NOME COMPLETO"]}</div>`
-              : "-"
-          }
-          ${
-            ramal["E-MAIL"]
-              ? `<div class="text-blue-600"><a href="mailto:${ramal["E-MAIL"]}" class="hover:underline">${ramal["E-MAIL"]}</a></div>`
-              : ""
-          }
-        </div>
-        <div class="text-gray-600 whitespace-nowrap w-4 ml-16">
-          <i class="fas fa-phone mr-1 text-blue-500"></i>${ramal.RAMAL}
-        </div>
-        <div class="text-gray-600 whitespace-nowrap w-4 ml-2">
-          ${
-            ramal.DDR
-              ? `<i class="fas fa-phone-alt mr-1 text-gray-600"></i>${ramal.DDR}`
-              : "-"
-          }
-        </div>
-        <div class="font-medium text-blue-800 w-56">${ramal.SETOR}</div>
-        <div class="text-gray-600 truncate w-48 ml-1">
-          ${
-            ramal.OBSERVAÇÃO
-              ? `<i class="fas fa-info-circle mr-1"></i>${ramal.OBSERVAÇÃO}`
-              : "-"
-          }
-        </div>
-      `;
-      table.appendChild(row);
-    });
-
-    ramaisContainer.appendChild(table);
-  } else {
-    // Layout em grade para visualização normal
-    const grid = document.createElement("div");
-    grid.className = "bg-white rounded-lg overflow-hidden";
-
-    // Cabeçalho
-    grid.innerHTML = `
-      <div class="grid grid-cols-6 bg-gray-50 px-1 py-1.5 text-sm font-medium text-gray-700 border-b">
-        <div class="w-56 ml-1 cursor-pointer hover:bg-gray-100 px-1 py-1 rounded flex items-center" onclick="handleHeaderClick('NOME')">
-          Nome
-          ${
-            window.currentSort.column === "NOME"
-              ? `<i class="fas fa-sort-${
-                  window.currentSort.direction === "asc" ? "up" : "down"
-                } ml-1"></i>`
-              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
-          }
-        </div>
-        <div class="w-80 ml-1 px-1 py-1 rounded flex items-center">
-          Nome completo / e-mail
-        </div>
-        <div class="w-4 ml-8 cursor-pointer hover:bg-gray-100 px-0 py-1 rounded flex items-center" onclick="handleHeaderClick('RAMAL')">
-          Ramal
-          ${
-            window.currentSort.column === "RAMAL"
-              ? `<i class="fas fa-sort-${
-                  window.currentSort.direction === "asc" ? "up" : "down"
-                } ml-1"></i>`
-              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
-          }
-        </div>
-        <div class="w-4 ml-1 cursor-pointer hover:bg-gray-100 px-0 py-1 rounded flex items-center" onclick="handleHeaderClick('DDR')">
-          DDR
-          ${
-            window.currentSort.column === "DDR"
-              ? `<i class="fas fa-sort-${
-                  window.currentSort.direction === "asc" ? "up" : "down"
-                } ml-1"></i>`
-              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
-          }
-        </div>
-        <div class="w-56 cursor-pointer hover:bg-gray-100 px-1 py-1 rounded flex items-center" onclick="handleHeaderClick('SETOR')">
-          Departamento
-          ${
-            window.currentSort.column === "SETOR"
-              ? `<i class="fas fa-sort-${
-                  window.currentSort.direction === "asc" ? "up" : "down"
-                } ml-1"></i>`
-              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
-          }
-        </div>
-        <div class="w-48 ml-1 cursor-pointer hover:bg-gray-100 px-1 py-1 rounded flex items-center" onclick="handleHeaderClick('OBSERVAÇÃO')">
-          Observação
-          ${
-            window.currentSort.column === "OBSERVAÇÃO"
-              ? `<i class="fas fa-sort-${
-                  window.currentSort.direction === "asc" ? "up" : "down"
-                } ml-1"></i>`
-              : `<i class="fas fa-sort ml-1 text-gray-400"></i>`
-          }
-        </div>
-      </div>
-    `;
-
-    // Linhas
-    sortedRamais.forEach((ramal) => {
-      const row = document.createElement("div");
-      row.className =
-        "grid grid-cols-6 px-1 py-1 text-sm border-b border-gray-100 hover:bg-gray-50";
-      row.innerHTML = `
-        <div class="font-medium text-gray-800 truncate w-56 ml-1">${
-          ramal.NOME
-        }</div>
-        <div class="text-gray-700 w-80 ml-1">
-          ${
-            ramal["NOME COMPLETO"]
-              ? `<div class="font-medium text-gray-800">${ramal["NOME COMPLETO"]}</div>`
-              : "-"
-          }
-          ${
-            ramal["E-MAIL"]
-              ? `<div class="text-blue-600"><a href="mailto:${ramal["E-MAIL"]}" class="hover:underline">${ramal["E-MAIL"]}</a></div>`
-              : ""
-          }
-        </div>
-        <div class="text-gray-600 whitespace-nowrap w-4 ml-8">
-          <i class="fas fa-phone mr-1 text-blue-500"></i>${ramal.RAMAL}
-        </div>
-        <div class="text-gray-600 whitespace-nowrap w-4 ml-1">
-          ${
-            ramal.DDR
-              ? `<i class="fas fa-phone-alt mr-1 text-gray-600"></i>${ramal.DDR}`
-              : "-"
-          }
-        </div>
-        <div class="font-medium text-blue-800 w-56">
-          ${
-            !selectedDepartment
-              ? `<span class="inline-block px-0.5 py-0 bg-blue-100 text-blue-800 rounded-full text-sm whitespace-nowrap">${ramal.SETOR}</span>`
-              : ""
-          }
-        </div>
-        <div class="text-gray-600 truncate w-48 ml-1">
-          ${
-            ramal.OBSERVAÇÃO
-              ? `<i class="fas fa-info-circle mr-1"></i>${ramal.OBSERVAÇÃO}`
-              : "-"
-          }
-        </div>
-      `;
-      grid.appendChild(row);
-    });
-
-    ramaisContainer.appendChild(grid);
-  }
-}
-
-// Filter ramais
-function filterRamais() {
-  const searchTerm = normalizeText(searchInput.value.toLowerCase());
-  const selectedDepartment = departmentFilter.value;
-
-  const filteredRamais = ramaisData.filter((ramal) => {
-    // Se houver termo de busca, procura em todos os departamentos
-    if (searchTerm) {
-      const searchIn = normalizeText(
-        `${ramal.NOME} ${ramal.SETOR}`.toLowerCase()
-      );
-      if (!searchIn.includes(searchTerm)) return false;
-    }
-
-    // Filtro por departamento só é aplicado se não houver termo de busca
-    if (
-      !searchTerm &&
-      selectedDepartment &&
-      ramal.SETOR !== selectedDepartment
-    ) {
-      return false;
-    }
-
-    return true;
+    tbody.appendChild(tr);
   });
 
-  displayRamais(filteredRamais);
+  ramaisContainer.appendChild(table);
 }
 
-// Reset filters
+function filterRamais() {
+  const searchTerm = normalizeText(searchInput.value);
+  const selectedDepartment = departmentFilter.value;
+
+  const filtered = ramaisData.filter((ramal) => {
+    if (selectedDepartment && ramal.departamento !== selectedDepartment) return false;
+    if (!searchTerm) return true;
+
+    const searchIn = normalizeText(
+      `${ramal.nome} ${ramal.departamento} ${ramal.ramal} ${ramal.ddr} ${ramal.email} ${ramal.observacao}`
+    );
+    return searchIn.includes(searchTerm);
+  });
+
+  displayRamais(filtered);
+}
+
 function resetAllFilters() {
   searchInput.value = "";
   departmentFilter.value = "";
   filterRamais();
 }
 
-// Event listeners
 searchBtn.addEventListener("click", filterRamais);
-searchInput.addEventListener("keyup", function (e) {
+searchInput.addEventListener("keyup", (e) => {
   if (e.key === "Enter") filterRamais();
 });
 departmentFilter.addEventListener("change", filterRamais);
 resetFilters.addEventListener("click", resetAllFilters);
 
-// Load data when page loads
 document.addEventListener("DOMContentLoaded", loadRamaisData);

@@ -83,6 +83,17 @@
       color: #3b82f6;
       text-decoration: underline;
     }
+
+    .menu-dropdown {
+      position: absolute;
+      right: 0;
+      margin-top: 0.5rem;
+      width: 12rem;
+      background: #fff;
+      border-radius: 0.375rem;
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      z-index: 50;
+    }
   </style>
 </head>
 
@@ -99,7 +110,20 @@
         </div>
         <p class="text-sm text-gray-200 mt-1" id="schoolAddress"></p>
       </div>
-      <div style="width: 100px;"></div>
+      <nav aria-label="Menu" class="relative">
+        <button id="menuBtn" class="flex flex-col justify-center items-center w-10 h-10 rounded hover:bg-blue-600 focus:outline-none" aria-label="Abrir menu">
+          <span class="block w-6 h-0.5 bg-white mb-1"></span>
+          <span class="block w-6 h-0.5 bg-white mb-1"></span>
+          <span class="block w-6 h-0.5 bg-white"></span>
+        </button>
+        <div id="menuDropdown" class="hidden menu-dropdown">
+          <a href="escolas.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Escolas</a>
+          <a href="ramais.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Ramais</a>
+          <a href="calendarioemef.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário EMEF</a>
+          <a href="calendarioemei.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário EMEI</a>
+          <a href="calendariomaternal.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário Maternal</a>
+        </div>
+      </nav>
     </div>
   </header>
   <main class="map-container">
@@ -111,46 +135,95 @@
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script src="js/script.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const schoolName = decodeURIComponent(urlParams.get('name'));
-      console.log('Looking for school:', schoolName);
-      const school = schools.find(s => s.name === schoolName);
-      console.log('Found school:', school);
-
-      document.getElementById('schoolName').textContent = schoolName;
-      if (school) {
-        document.getElementById('schoolType').textContent = school.type;
-        document.getElementById('schoolAddress').textContent = `${school.address}, ${school.neighborhood}`;
-      }
-
-      if (school && school.latitude && school.longitude) {
-        console.log('Using coordinates:', school.latitude, school.longitude);
-        const map = L.map('map').setView([school.latitude, school.longitude], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        const marker = L.marker([school.latitude, school.longitude]).addTo(map);
-        let popupContent = `
-          <strong>${school.name}</strong><br>
-          ${school.address}<br>
-          ${school.neighborhood}
-        `;
-        if (school.phones && school.phones.length > 0) {
-          popupContent += `<br>Telefones: ${school.phones.join(', ')}`;
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+    document.addEventListener('click', function (e) {
+      if (menuBtn && menuDropdown) {
+        if (menuBtn.contains(e.target)) {
+          menuDropdown.classList.toggle('hidden');
+        } else if (!menuDropdown.contains(e.target)) {
+          menuDropdown.classList.add('hidden');
         }
-        marker.bindPopup(popupContent);
-      } else {
-        console.log('No coordinates found for school');
-        document.getElementById('map').innerHTML = `
-          <div class="error-message">
-            <p>Localização não disponível</p>
-            <p>Não foi possível encontrar as coordenadas para esta escola.</p>
-            <a href="index.html">Voltar para a página inicial</a>
-          </div>
-        `;
       }
+    });
+
+    function getCoordinatesFromGoogleMapsUrl(url) {
+      if (!url) return null;
+
+      const atMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+      if (atMatch) {
+        return { lat: Number(atMatch[1]), lng: Number(atMatch[2]) };
+      }
+
+      const encodedMatch = url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+      if (encodedMatch) {
+        return { lat: Number(encodedMatch[1]), lng: Number(encodedMatch[2]) };
+      }
+
+      return null;
+    }
+
+    function showUnavailableMapMessage(school) {
+      const mapsButton = school && school.mapsUrl
+        ? `<a href="${school.mapsUrl}" target="_blank" rel="noopener noreferrer" class="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Abrir no Google Maps</a>`
+        : '';
+
+      document.getElementById('map').innerHTML = `
+        <div class="error-message">
+          <p>Localização não disponível no mapa interno.</p>
+          <p>Use o link do Google Maps para abrir a unidade.</p>
+          ${mapsButton}
+        </div>
+      `;
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const schoolNameParam = urlParams.get('name') || '';
+      const schoolName = decodeURIComponent(schoolNameParam);
+
+      if (typeof window.loadSchoolsData === 'function') {
+        await window.loadSchoolsData();
+      }
+
+      const school = typeof window.findSchoolByName === 'function'
+        ? window.findSchoolByName(schoolName)
+        : null;
+
+      document.getElementById('schoolName').textContent = schoolName || 'Escola não informada';
+
+      if (!school) {
+        showUnavailableMapMessage(null);
+        return;
+      }
+
+      document.getElementById('schoolType').textContent = school.type || '';
+      document.getElementById('schoolAddress').textContent = `${school.address || ''}${school.neighborhood ? `, ${school.neighborhood}` : ''}`;
+
+      const coordinates = getCoordinatesFromGoogleMapsUrl(school.mapsUrl);
+      if (!coordinates) {
+        showUnavailableMapMessage(school);
+        return;
+      }
+
+      const map = L.map('map').setView([coordinates.lat, coordinates.lng], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      const marker = L.marker([coordinates.lat, coordinates.lng]).addTo(map);
+      let popupContent = `
+        <strong>${school.name}</strong><br>
+        ${school.address || ''}<br>
+        ${school.neighborhood || ''}
+      `;
+      if (school.phones && school.phones.length > 0) {
+        popupContent += `<br>Telefones: ${school.phones.join(', ')}`;
+      }
+      if (school.mapsUrl) {
+        popupContent += `<br><a href="${school.mapsUrl}" target="_blank" rel="noopener noreferrer">Abrir Google Maps</a>`;
+      }
+      marker.bindPopup(popupContent).openPopup();
     });
   </script>
 </body>

@@ -22,6 +22,22 @@
           </a>
           <h1 class="text-2xl md:text-3xl font-bold">Ramais da Secretaria da Educação</h1>
         </div>
+        <nav aria-label="Menu" class="flex items-center w-full md:w-auto justify-end">
+          <div class="ml-4 relative">
+            <button id="menuBtn" class="flex flex-col justify-center items-center w-10 h-10 rounded hover:bg-blue-600 focus:outline-none" aria-label="Abrir menu">
+              <span class="block w-6 h-0.5 bg-white mb-1"></span>
+              <span class="block w-6 h-0.5 bg-white mb-1"></span>
+              <span class="block w-6 h-0.5 bg-white"></span>
+            </button>
+            <div id="menuDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded shadow-lg z-50">
+              <a href="escolas.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Escolas</a>
+              <a href="ramais.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Ramais</a>
+              <a href="calendarioemef.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário EMEF</a>
+              <a href="calendarioemei.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário EMEI</a>
+              <a href="calendariomaternal.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário Maternal</a>
+            </div>
+          </div>
+        </nav>
       </div>
     </div>
   </header>
@@ -37,7 +53,7 @@
         <div class="w-full md:w-1/3">
           <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
           <div class="relative">
-            <input type="text" id="searchInput" placeholder="Buscar por nome..." class="w-full px-3 py-1 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <input type="text" id="searchInput" placeholder="Buscar por nome, setor, ramal, DDR ou e-mail..." class="w-full px-3 py-1 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
             <button id="searchBtn" class="absolute right-0 top-0 h-full px-3 text-blue-600 rounded-r-md bg-white hover:bg-gray-100">
               <i class="fas fa-search"></i>
             </button>
@@ -52,7 +68,7 @@
     </section>
     <section class="bg-white rounded-lg shadow-md compact-section" aria-label="Resultados">
       <div class="flex justify-between items-center p-3 border-b">
-        <h2 class="text-xl font-semibold text-gray-800">Ramais Encontrados</h2>
+        <h2 class="text-xl font-semibold text-gray-800">Ramais e Contatos Internos</h2>
         <div class="text-gray-600">
           <span id="resultCount">0</span> resultados
         </div>
@@ -91,16 +107,17 @@
   </footer>
 
   <script>
-    // Make handleHeaderClick function globally available
-    window.handleHeaderClick = function (column) {
-      if (window.currentSort.column === column) {
-        window.currentSort.direction = window.currentSort.direction === 'asc' ? 'desc' : 'asc';
-      } else {
-        window.currentSort.column = column;
-        window.currentSort.direction = 'asc';
+    const menuBtn = document.getElementById('menuBtn');
+    const menuDropdown = document.getElementById('menuDropdown');
+    document.addEventListener('click', function (e) {
+      if (menuBtn && menuDropdown) {
+        if (menuBtn.contains(e.target)) {
+          menuDropdown.classList.toggle('hidden');
+        } else if (!menuDropdown.contains(e.target)) {
+          menuDropdown.classList.add('hidden');
+        }
       }
-      filterRamais();
-    };
+    });
   </script>
   <script src="js/ramais.js"></script>
 </body>
