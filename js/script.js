@@ -283,18 +283,24 @@ function displaySchools(schoolsToDisplay) {
 
       <div class="mt-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 text-sm">
         <div class="bg-gray-50 rounded p-2">
-          <p class="font-semibold text-gray-700 mb-1">Contatos da escola</p>
+          <p class="font-semibold text-gray-700 mb-1 flex items-center">
+            <i class="fas fa-address-book mr-2 text-gray-600"></i>Contatos da escola
+          </p>
           <p>${school.phones.join(" / ") || "-"}</p>
           ${school.ramal.length ? `<p><i class="fas fa-phone-alt mr-1 text-gray-600"></i>Ramais: ${school.ramal.join(", ")}</p>` : ""}
           ${school.whatsapp ? `<p><i class="fab fa-whatsapp mr-1 text-green-600"></i>${school.whatsapp}</p>` : ""}
         </div>
         <div class="bg-gray-50 rounded p-2">
-          <p class="font-semibold text-gray-700 mb-1">Direcao / Coordenacao</p>
+          <p class="font-semibold text-gray-700 mb-1 flex items-center">
+            <i class="fas fa-user-tie mr-2 text-gray-600"></i>Direcao / Coordenação
+          </p>
           <p>${formatContact(school.director, school.directorPhone, school.directorEmail) || "-"}</p>
           <p class="mt-1">${formatContact(school.coordinatorName, school.coordinatorRamal, school.coordinatorEmail) || ""}</p>
         </div>
         <div class="bg-gray-50 rounded p-2">
-          <p class="font-semibold text-gray-700 mb-1">Supervisao / Suporte</p>
+          <p class="font-semibold text-gray-700 mb-1 flex items-center">
+            <i class="fas fa-headset mr-2 text-gray-600"></i>Supervisão / Suporte
+          </p>
           <p>${formatContact(school.supervisorName, school.supervisorPhone, school.supervisorEmail) || "-"}</p>
           <p class="mt-1">${formatContact(school.supportName, school.supportPhone || school.supportRamal, school.supportEmail) || ""}</p>
         </div>
