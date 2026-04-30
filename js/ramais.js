@@ -72,21 +72,24 @@ async function loadRamaisData() {
     const csvText = new TextDecoder("utf-8").decode(buffer);
     const rows = parseSemicolonCsv(csvText);
     const headerIndex = rows.findIndex((row) =>
-      normalizeText(row[0]).includes("nome")
+      normalizeText(row[0]).includes("nome"),
     );
 
     if (headerIndex < 0) {
       throw new Error("Cabecalho do arquivo nao encontrado.");
     }
 
-    ramaisData = rows.slice(headerIndex + 1).map((row) => ({
-      nome: row[0] || "",
-      departamento: normalizeDepartment(row[1] || ""),
-      ramal: row[2] || "",
-      ddr: row[3] || "",
-      observacao: row[4] || "",
-      email: row[5] || "",
-    })).filter((row) => row.nome || row.departamento || row.ramal || row.email);
+    ramaisData = rows
+      .slice(headerIndex + 1)
+      .map((row) => ({
+        nome: row[0] || "",
+        departamento: normalizeDepartment(row[1] || ""),
+        ramal: row[2] || "",
+        ddr: row[3] || "",
+        observacao: row[4] || "",
+        email: row[5] || "",
+      }))
+      .filter((row) => row.nome || row.departamento || row.ramal || row.email);
 
     populateDepartmentFilter();
     filterRamais();
@@ -175,7 +178,7 @@ function displayRamais(ramaisToDisplay) {
   const sortedRamais = sortRamais(
     ramaisToDisplay,
     window.currentSort.column,
-    window.currentSort.direction
+    window.currentSort.direction,
   );
   resultCount.textContent = String(sortedRamais.length);
 
@@ -220,11 +223,12 @@ function filterRamais() {
   const selectedDepartment = departmentFilter.value;
 
   const filtered = ramaisData.filter((ramal) => {
-    if (selectedDepartment && ramal.departamento !== selectedDepartment) return false;
+    if (selectedDepartment && ramal.departamento !== selectedDepartment)
+      return false;
     if (!searchTerm) return true;
 
     const searchIn = normalizeText(
-      `${ramal.nome} ${ramal.departamento} ${ramal.ramal} ${ramal.ddr} ${ramal.email} ${ramal.observacao}`
+      `${ramal.nome} ${ramal.departamento} ${ramal.ramal} ${ramal.ddr} ${ramal.email} ${ramal.observacao}`,
     );
     return searchIn.includes(searchTerm);
   });

@@ -92,7 +92,8 @@ function inferSchoolType(name) {
 
 function cleanSchoolName(name, type) {
   if (!name) return "";
-  if (type === "OS") return name.replace(/^O\.?S\.?\s*MATERNAIS\s*/i, "").trim();
+  if (type === "OS")
+    return name.replace(/^O\.?S\.?\s*MATERNAIS\s*/i, "").trim();
   if (type === "CRI") return name.replace(/^INFANTIL\s*/i, "").trim();
   return name.replace(/^[A-Z\.]+\s+/i, "").trim();
 }
@@ -116,7 +117,10 @@ function formatContact(name, phone, email) {
   const chunks = [];
   if (name) chunks.push(name);
   if (phone) chunks.push(phone);
-  if (email) chunks.push(`<a href="mailto:${email}" class="text-blue-600 hover:underline">${email}</a>`);
+  if (email)
+    chunks.push(
+      `<a href="mailto:${email}" class="text-blue-600 hover:underline">${email}</a>`,
+    );
   if (chunks.length === 0) return "";
   return chunks.join(" - ");
 }
@@ -127,7 +131,9 @@ function populateNeighborhoodOptions() {
   }
 
   const uniqueNeighborhoods = [
-    ...new Set(schoolsData.map((school) => school.neighborhood).filter(Boolean)),
+    ...new Set(
+      schoolsData.map((school) => school.neighborhood).filter(Boolean),
+    ),
   ].sort((a, b) => a.localeCompare(b));
 
   uniqueNeighborhoods.forEach((neighborhood) => {
@@ -149,7 +155,7 @@ async function loadSchoolsData() {
       const csvText = new TextDecoder("utf-8").decode(buffer);
       const rows = parseSemicolonCsv(csvText);
       const headerIndex = rows.findIndex((row) =>
-        normalizeText(row[0]).toUpperCase().startsWith("ESCOLA")
+        normalizeText(row[0]).toUpperCase().startsWith("ESCOLA"),
       );
 
       if (headerIndex < 0) {
@@ -321,7 +327,8 @@ function filterSchools() {
   const filteredSchools = schoolsData
     .filter((school) => {
       if (!selectedTypes.includes(school.type)) return false;
-      if (selectedNeighborhood && school.neighborhood !== selectedNeighborhood) return false;
+      if (selectedNeighborhood && school.neighborhood !== selectedNeighborhood)
+        return false;
 
       if (searchTerm) {
         const searchIn = [
@@ -403,7 +410,7 @@ if (exportExcelBtn) {
       XLSX.utils.book_append_sheet(workbook, worksheet, "Escolas");
       XLSX.writeFile(
         workbook,
-        `escolas_${new Date().toISOString().replace(/[:.]/g, "-")}.xlsx`
+        `escolas_${new Date().toISOString().replace(/[:.]/g, "-")}.xlsx`,
       );
     } catch (error) {
       console.error("Erro ao exportar:", error);
@@ -418,7 +425,7 @@ if (searchBtn && searchInput && neighborhoodFilter && resetFilters) {
     if (e.key === "Enter") filterSchools();
   });
   filterCheckboxes.forEach((checkbox) =>
-    checkbox.addEventListener("change", filterSchools)
+    checkbox.addEventListener("change", filterSchools),
   );
   neighborhoodFilter.addEventListener("change", filterSchools);
   resetFilters.addEventListener("click", resetAllFilters);
