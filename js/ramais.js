@@ -69,7 +69,7 @@ async function loadRamaisData() {
   try {
     const response = await fetch("csv/ramaisNovo.csv");
     const buffer = await response.arrayBuffer();
-    const csvText = new TextDecoder("latin1").decode(buffer);
+    const csvText = new TextDecoder("utf-8").decode(buffer);
     const rows = parseSemicolonCsv(csvText);
     const headerIndex = rows.findIndex((row) =>
       normalizeText(row[0]).includes("nome")
