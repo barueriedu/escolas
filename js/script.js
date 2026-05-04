@@ -125,6 +125,11 @@ function formatContact(name, phone, email) {
   return chunks.join(" - ");
 }
 
+function getFirstName(fullName) {
+  if (!fullName) return "";
+  return fullName.trim().split(/\s+/)[0];
+}
+
 function populateNeighborhoodOptions() {
   while (neighborhoodFilter.options.length > 1) {
     neighborhoodFilter.remove(1);
@@ -300,15 +305,15 @@ function displaySchools(schoolsToDisplay) {
           <p class="font-semibold text-gray-700 mb-1 flex items-center">
             <i class="fas fa-user-tie mr-2 text-gray-600"></i>Direcao / Coordenação
           </p>
-          <p>${formatContact(school.director, school.directorPhone, school.directorEmail) || "-"}</p>
-          <p class="mt-1">${formatContact(school.coordinatorName, school.coordinatorRamal, school.coordinatorEmail) || ""}</p>
+          <p>${formatContact(getFirstName(school.director), "", school.directorEmail) || "-"}</p>
+          <p class="mt-1">${formatContact(getFirstName(school.coordinatorName), school.coordinatorRamal, school.coordinatorEmail) || ""}</p>
         </div>
         <div class="bg-gray-50 rounded p-2">
           <p class="font-semibold text-gray-700 mb-1 flex items-center">
             <i class="fas fa-headset mr-2 text-gray-600"></i>Supervisão / Suporte
           </p>
-          <p>${formatContact(school.supervisorName, school.supervisorPhone, school.supervisorEmail) || "-"}</p>
-          <p class="mt-1">${formatContact(school.supportName, school.supportPhone || school.supportRamal, school.supportEmail) || ""}</p>
+          <p>${formatContact(getFirstName(school.supervisorName), "", school.supervisorEmail) || "-"}</p>
+          <p class="mt-1">${formatContact(getFirstName(school.supportName), school.supportRamal, school.supportEmail) || ""}</p>
         </div>
       </div>
     `;
@@ -397,12 +402,12 @@ if (exportExcelBtn) {
         s.schoolEmail || "",
         s.address || "",
         s.neighborhood || "",
-        s.director || "",
+        getFirstName(s.director) || "",
         s.directorEmail || "",
-        s.coordinatorName || "",
+        getFirstName(s.coordinatorName) || "",
         s.coordinatorRamal || "",
-        s.supervisorName || "",
-        s.supportName || "",
+        getFirstName(s.supervisorName) || "",
+        getFirstName(s.supportName) || "",
       ]);
 
       const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]);

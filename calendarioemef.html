@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="./img/favicon_barueri3.svg" width="32" height="32" type="image/svg+xml">
-  <title>Calendário EMEF 2025</title>
+  <title>Calendário EMEF 2026</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/style.css">
@@ -19,7 +19,7 @@
       <div class="flex flex-col md:flex-row justify-between items-center">
         <div class="flex items-center mb-4 md:mb-0">
           <a href="index.html"><img src="img/logo_Barueri_Educ_PNG.png" alt="Logo Barueri Educação" class="header-logo mr-3"></a>
-          <h1 class="text-2xl md:text-3xl font-bold">Calendário EMEF 2025</h1>
+          <h1 class="text-2xl md:text-3xl font-bold">Calendário EMEF 2026</h1>
         </div>
         <div class="flex items-center gap-4 w-full md:w-auto justify-center md:justify-center">
           <button class="bimestre-btn bg-white text-blue-700 border border-blue-400 rounded px-3 py-1 font-semibold transition hover:bg-blue-100" data-bimestre="1">1º Bimestre</button>
@@ -104,23 +104,23 @@
       </div>
     </div>
   </footer>
-  <script src="js/calendarioemef.js"></script>
+  <script src="js/calendarioEmef2026.js" type="module"></script>
   <script>
     // --- Bimestre Highlight ---
     const bimestreRanges = {
-      1: { start: new Date(2025, 1, 10), end: new Date(2025, 3, 30), dias: 53 }, // 10/02 a 30/04
-      2: { start: new Date(2025, 4, 5), end: new Date(2025, 6, 5), dias: 44 },   // 05/05 a 05/07
-      3: { start: new Date(2025, 6, 21), end: new Date(2025, 8, 30), dias: 53 }, // 21/07 a 30/09
-      4: { start: new Date(2025, 9, 1), end: new Date(2025, 11, 19), dias: 55 }, // 01/10 a 19/12
+      1: { start: new Date(2026, 1, 9), end: new Date(2026, 3, 30), dias: 51 }, // 09/02 a 30/04
+      2: { start: new Date(2026, 4, 4), end: new Date(2026, 6, 1), dias: 59 },   // 04/05 a 01/07
+      3: { start: new Date(2026, 6, 27), end: new Date(2026, 8, 30), dias: 66 }, // 27/07 a 30/09
+      4: { start: new Date(2026, 9, 1), end: new Date(2026, 11, 18), dias: 79 }, // 01/10 a 18/12
     };
 
     // Legendas dos eventos por bimestre
     const bimestreLegendas = {
       1: [
-        'Início das Aulas (10/02)',
+        'Início das Aulas (09/02)',
         'Semana Pedagógica',
         'Carnaval',
-        'Feriados: Tiradentes, Sexta-feira Santa, Páscoa'
+        'Feriados: Tiradentes, Sexta-feira Santa'
       ],
       2: [
         'Dia do Trabalho (01/05)',
@@ -128,7 +128,7 @@
         'Festa Junina'
       ],
       3: [
-        'Retorno das aulas (21/07)',
+        'Retorno das aulas (27/07)',
         'Feriados do 2º semestre'
       ],
       4: [
@@ -157,7 +157,7 @@
           ].indexOf(monthName);
           // Ignora cabeçalhos
           if (isNaN(day)) return;
-          const date = new Date(2025, monthIdx, day);
+          const date = new Date(2026, monthIdx, day);
           if (date >= start && date <= end) {
             dayDiv.style.opacity = '1';
             dayDiv.style.filter = 'none';

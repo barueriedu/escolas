@@ -67,27 +67,56 @@ function normalizeDepartment(value) {
 
 async function loadRamaisData() {
   try {
-    const response = await fetch("csv/ramaisNovo.csv");
+    const response = await fetch("csv/ramais.csv");
     const buffer = await response.arrayBuffer();
     const csvText = new TextDecoder("utf-8").decode(buffer);
     const rows = parseSemicolonCsv(csvText);
     const headerIndex = rows.findIndex((row) =>
-      normalizeText(row[0]).includes("nome"),
+      row.some((cell) => normalizeText(cell).includes("nome"))
     );
 
     if (headerIndex < 0) {
       throw new Error("Cabecalho do arquivo nao encontrado.");
     }
 
+    const headers = rows[headerIndex].map((cell) => normalizeText(cell));
+    const findHeaderIndex = (labels) =>
+      labels.reduce((found, label) => {
+        if (found >= 0) return found;
+        return headers.findIndex((header) => header.includes(label));
+      }, -1);
+
+    const idxNome = findHeaderIndex(["nome completo", "nome"]);
+    const idxDepartamento = findHeaderIndex([
+      "setor",
+      "departamento/setor",
+      "departamento",
+    ]);
+    const idxRamal = findHeaderIndex(["ramal"]);
+    const idxDdr = findHeaderIndex(["ddr"]);
+    const idxObservacao = findHeaderIndex([
+      "observacao",
+      "observaçao",
+      "obs",
+    ]);
+    const idxEmail = findHeaderIndex(["email", "e-mail"]);
+
+    const getCell = (row, index, fallbackIndex = -1) => {
+      if (index >= 0 && row[index] !== undefined) return row[index];
+      if (fallbackIndex >= 0 && row[fallbackIndex] !== undefined)
+        return row[fallbackIndex];
+      return "";
+    };
+
     ramaisData = rows
       .slice(headerIndex + 1)
       .map((row) => ({
-        nome: row[0] || "",
-        departamento: normalizeDepartment(row[1] || ""),
-        ramal: row[2] || "",
-        ddr: row[3] || "",
-        observacao: row[4] || "",
-        email: row[5] || "",
+        nome: getCell(row, idxNome, 1),
+        departamento: normalizeDepartment(getCell(row, idxDepartamento, 0)),
+        ramal: getCell(row, idxRamal, 2),
+        ddr: getCell(row, idxDdr, 3),
+        observacao: getCell(row, idxObservacao, 4),
+        email: getCell(row, idxEmail, 6),
       }))
       .filter((row) => row.nome || row.departamento || row.ramal || row.email);
 
@@ -99,7 +128,7 @@ async function loadRamaisData() {
       <div class="bg-white p-6 rounded-lg shadow-md text-center">
         <i class="fas fa-exclamation-circle text-5xl text-red-400 mb-4"></i>
         <h3 class="text-xl font-semibold text-gray-700 mb-2">Erro ao carregar dados</h3>
-        <p class="text-gray-500">Nao foi possivel ler o arquivo csv/ramaisNovo.csv.</p>
+        <p class="text-gray-500">Nao foi possivel ler o arquivo csv/ramais.csv.</p>
       </div>
     `;
   }
