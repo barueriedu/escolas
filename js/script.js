@@ -125,6 +125,30 @@ function formatContact(name, phone, email) {
   return chunks.join(" - ");
 }
 
+function formatRoleLine(role, name, phone, email, ramal) {
+  const details = [];
+  if (phone) details.push(`<span class="inline-flex items-center"><i class="fas fa-phone mr-1 text-gray-600"></i>${phone}</span>`);
+  if (email)
+    details.push(
+      `<span class="inline-flex items-center"><i class="fas fa-envelope mr-1 text-gray-600"></i><a href="mailto:${email}" class="text-blue-600 hover:underline">${email}</a></span>`,
+    );
+  if (ramal)
+    details.push(
+      `<span class="inline-flex items-center"><i class="fas fa-phone mr-1 text-gray-600"></i>${ramal}</span>`,
+    );
+
+  if (!name && details.length === 0) {
+    return `<p class="text-sm text-gray-600"><span class="font-semibold">${role}:</span> -</p>`;
+  }
+
+  const nameLine = `<p class="text-sm text-gray-700"><span class="font-semibold">${role}:</span> ${name || "-"}</p>`;
+  const detailsLine = details.length
+    ? `<p class="text-sm text-gray-600 ml-5 mt-1">${details.join(" - ")}</p>`
+    : "";
+
+  return `${nameLine}${detailsLine}`;
+}
+
 function getFirstName(fullName) {
   if (!fullName) return "";
   return fullName.trim().split(/\s+/)[0];
@@ -155,7 +179,7 @@ async function loadSchoolsData() {
 
   schoolsDataPromise = (async () => {
     try {
-      const response = await fetch("csv/escolasNovo.csv");
+      const response = await fetch("csv/escolasatualizadas_novo.csv");
       const buffer = await response.arrayBuffer();
       const csvText = new TextDecoder("utf-8").decode(buffer);
       const rows = parseSemicolonCsv(csvText);
@@ -179,7 +203,7 @@ async function loadSchoolsData() {
           type,
           rawName: schoolLabel,
           name: cleanSchoolName(schoolLabel, type),
-          phones: parsePhones(row[1]).concat(parsePhones(row[2])),
+          phones: parsePhones(row[1]),
           whatsapp: row[3] || "",
           schoolEmail: row[4] || "",
           address: row[5] || "",
@@ -202,8 +226,6 @@ async function loadSchoolsData() {
 
         school.ramal = [
           ...parseRamais(row[2]),
-          ...parseRamais(row[9]),
-          ...parseRamais(row[19]),
         ];
 
         schoolsData.push(school);
@@ -230,7 +252,7 @@ async function loadSchoolsData() {
         <div class="bg-white p-6 rounded-lg shadow-md text-center">
           <i class="fas fa-exclamation-circle text-5xl text-red-400 mb-4"></i>
           <h3 class="text-xl font-semibold text-gray-700 mb-2">Erro ao carregar dados</h3>
-          <p class="text-gray-500">Nao foi possivel carregar o arquivo csv/escolasNovo.csv.</p>
+          <p class="text-gray-500">Nao foi possivel carregar o arquivo csv/escolasatualizadas_novo.csv.</p>
         </div>
       `;
     }
@@ -293,27 +315,21 @@ function displaySchools(schoolsToDisplay) {
       </div>
 
       <div class="mt-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 text-sm">
-        <div class="bg-gray-50 rounded p-2">
-          <p class="font-semibold text-gray-700 mb-1 flex items-center">
-            <i class="fas fa-address-book mr-2 text-gray-600"></i>Contatos da escola
+        <div class="bg-gray-50 rounded p-2 flex flex-col justify-center h-full">
+          <p class="font-semibold text-gray-700 mb-1 flex items-center gap-2">
+            <i class="fas fa-address-book text-gray-600"></i>Contatos da escola
           </p>
-          <p>${school.phones.join(" / ") || "-"}</p>
-          ${school.ramal.length ? `<p><i class="fas fa-phone-alt mr-1 text-gray-600"></i>Ramais: ${school.ramal.join(", ")}</p>` : ""}
-          ${school.whatsapp ? `<p><i class="fab fa-whatsapp mr-1 text-green-600"></i>${school.whatsapp}</p>` : ""}
+          <p class="flex items-center"><i class="fas fa-phone-square mr-1 text-gray-600"></i>${school.phones.join(" / ") || "-"}</p>
+          ${school.ramal.length ? `<p class="flex items-center mt-1"><i class="fas fa-phone-square mr-1 text-gray-600"></i>Ramais: ${school.ramal.join(", ")}</p>` : ""}
+          ${school.whatsapp ? `<p class="flex items-center mt-1"><i class="fab fa-whatsapp mr-1 text-green-600"></i>${school.whatsapp}</p>` : ""}
         </div>
-        <div class="bg-gray-50 rounded p-2">
-          <p class="font-semibold text-gray-700 mb-1 flex items-center">
-            <i class="fas fa-user-tie mr-2 text-gray-600"></i>Direcao / Coordenação
-          </p>
-          <p>${formatContact(getFirstName(school.director), "", school.directorEmail) || "-"}</p>
-          <p class="mt-1">${formatContact(getFirstName(school.coordinatorName), school.coordinatorRamal, school.coordinatorEmail) || ""}</p>
+        <div class="bg-gray-50 rounded p-2 flex flex-col justify-center h-full">
+          ${formatRoleLine("Diretor(a)", getFirstName(school.director), "", school.directorEmail, "")}
+          ${formatRoleLine("Coordenador(a)", getFirstName(school.coordinatorName), "", school.coordinatorEmail, school.coordinatorRamal)}
         </div>
-        <div class="bg-gray-50 rounded p-2">
-          <p class="font-semibold text-gray-700 mb-1 flex items-center">
-            <i class="fas fa-headset mr-2 text-gray-600"></i>Supervisão / Suporte
-          </p>
-          <p>${formatContact(getFirstName(school.supervisorName), "", school.supervisorEmail) || "-"}</p>
-          <p class="mt-1">${formatContact(getFirstName(school.supportName), school.supportRamal, school.supportEmail) || ""}</p>
+        <div class="bg-gray-50 rounded p-2 flex flex-col justify-center h-full">
+          ${formatRoleLine("Supervisor(a)", getFirstName(school.supervisorName), "", school.supervisorEmail, "")}
+          ${formatRoleLine("Suporte", getFirstName(school.supportName), "", school.supportEmail, school.supportRamal)}
         </div>
       </div>
     `;
@@ -365,14 +381,6 @@ function resetAllFilters() {
   });
   neighborhoodFilter.value = "";
   filterSchools();
-}
-
-function initMap() {
-  map = L.map("map").setView([-23.5115, -46.8723], 12);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: "© OpenStreetMap contributors",
-  }).addTo(map);
 }
 
 if (exportExcelBtn) {
@@ -440,17 +448,17 @@ document.addEventListener("click", (e) => {
   if (e.target.classList.contains("map-btn") || e.target.closest(".map-btn")) {
     const schoolCard = e.target.closest(".school-card");
     const schoolName = schoolCard?.querySelector("h3")?.textContent || "";
-    window.location.href = `mapa.html?name=${encodeURIComponent(schoolName)}`;
+    const school = findSchoolByName(schoolName);
+    if (school && school.mapsUrl) {
+      window.open(school.mapsUrl, "_blank");
+    }
   }
 });
 
 document.addEventListener("DOMContentLoaded", () => {
   if (schoolsContainer) {
-    setTimeout(initMap, 100);
     loadSchoolsData();
   }
 });
 
 window.loadSchoolsData = loadSchoolsData;
-window.getSchoolsData = () => schoolsData;
-window.findSchoolByName = findSchoolByName;
