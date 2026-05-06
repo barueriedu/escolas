@@ -127,7 +127,10 @@ function formatContact(name, phone, email) {
 
 function formatRoleLine(role, name, phone, email, ramal) {
   const details = [];
-  if (phone) details.push(`<span class="inline-flex items-center"><i class="fas fa-phone mr-1 text-gray-600"></i>${phone}</span>`);
+  if (phone)
+    details.push(
+      `<span class="inline-flex items-center"><i class="fas fa-phone mr-1 text-gray-600"></i>${phone}</span>`,
+    );
   if (email)
     details.push(
       `<span class="inline-flex items-center"><i class="fas fa-envelope mr-1 text-gray-600"></i><a href="mailto:${email}" class="text-blue-600 hover:underline">${email}</a></span>`,
@@ -224,9 +227,7 @@ async function loadSchoolsData() {
           supportEmail: row[20] || "",
         };
 
-        school.ramal = [
-          ...parseRamais(row[2]),
-        ];
+        school.ramal = [...parseRamais(row[2])];
 
         schoolsData.push(school);
       });
