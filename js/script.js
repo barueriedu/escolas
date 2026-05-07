@@ -127,10 +127,7 @@ function formatContact(name, phone, email) {
 
 function formatRoleLine(role, name, phone, email, ramal) {
   const details = [];
-  if (phone)
-    details.push(
-      `<span class="inline-flex items-center"><i class="fas fa-phone mr-1 text-gray-600"></i>${phone}</span>`,
-    );
+  if (phone) details.push(`<span class="inline-flex items-center"><i class="fas fa-phone mr-1 text-gray-600"></i>${phone}</span>`);
   if (email)
     details.push(
       `<span class="inline-flex items-center"><i class="fas fa-envelope mr-1 text-gray-600"></i><a href="mailto:${email}" class="text-blue-600 hover:underline">${email}</a></span>`,
@@ -227,7 +224,9 @@ async function loadSchoolsData() {
           supportEmail: row[20] || "",
         };
 
-        school.ramal = [...parseRamais(row[2])];
+        school.ramal = [
+          ...parseRamais(row[2]),
+        ];
 
         schoolsData.push(school);
       });
@@ -325,12 +324,18 @@ function displaySchools(schoolsToDisplay) {
           ${school.whatsapp ? `<p class="flex items-center mt-1"><i class="fab fa-whatsapp mr-1 text-green-600"></i>${school.whatsapp}</p>` : ""}
         </div>
         <div class="bg-gray-50 rounded p-2 flex flex-col justify-center h-full">
-          ${formatRoleLine("Diretor(a)", getFirstName(school.director), "", school.directorEmail, "")}
+          <p class="font-semibold text-gray-700 mb-1 flex items-center gap-2">
+            <i class="fas fa-user-tie text-gray-600"></i>Direção / Coordenação
+          </p>
+          ${formatRoleLine("Diretor(a)", getFirstName(school.director), school.directorPhone, school.directorEmail, "")}
           ${formatRoleLine("Coordenador(a)", getFirstName(school.coordinatorName), "", school.coordinatorEmail, school.coordinatorRamal)}
         </div>
         <div class="bg-gray-50 rounded p-2 flex flex-col justify-center h-full">
-          ${formatRoleLine("Supervisor(a)", getFirstName(school.supervisorName), "", school.supervisorEmail, "")}
-          ${formatRoleLine("Suporte", getFirstName(school.supportName), "", school.supportEmail, school.supportRamal)}
+          <p class="font-semibold text-gray-700 mb-1 flex items-center gap-2">
+            <i class="fas fa-headset text-gray-600"></i>Supervisão / Suporte
+          </p>
+          ${formatRoleLine("Supervisor(a)", getFirstName(school.supervisorName), school.supervisorPhone, school.supervisorEmail, "")}
+          ${formatRoleLine("Suporte", getFirstName(school.supportName), school.supportPhone, school.supportEmail, school.supportRamal)}
         </div>
       </div>
     `;
