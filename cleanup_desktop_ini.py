@@ -9,6 +9,7 @@ files_to_remove = [
     worktree / "desktop.ini",
     worktree / "refs" / "desktop.ini",
     worktree / "logs" / "desktop.ini",
+    Path("../../escolas/.git/refs/desktop.ini"),
 ]
 
 for file_path in files_to_remove:
