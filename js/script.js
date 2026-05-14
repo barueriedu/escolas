@@ -325,14 +325,14 @@ function displaySchools(schoolsToDisplay) {
         </div>
         <div class="bg-gray-50 rounded p-2 flex flex-col justify-center h-full">
           <p class="font-semibold text-gray-700 mb-1 flex items-center gap-2">
-            <i class="fas fa-user-tie text-gray-600"></i>Direção / Coordenação
+            <i class="fas fa-user-tie text-gray-600"></i>
           </p>
           ${formatRoleLine("Diretor(a)", getFirstName(school.director), school.directorPhone, school.directorEmail, "")}
           ${formatRoleLine("Coordenador(a)", getFirstName(school.coordinatorName), "", school.coordinatorEmail, school.coordinatorRamal)}
         </div>
         <div class="bg-gray-50 rounded p-2 flex flex-col justify-center h-full">
           <p class="font-semibold text-gray-700 mb-1 flex items-center gap-2">
-            <i class="fas fa-headset text-gray-600"></i>Supervisão / Suporte
+            <i class="fas fa-headset text-gray-600"></i>
           </p>
           ${formatRoleLine("Supervisor(a)", getFirstName(school.supervisorName), school.supervisorPhone, school.supervisorEmail, "")}
           ${formatRoleLine("Suporte", getFirstName(school.supportName), school.supportPhone, school.supportEmail, school.supportRamal)}

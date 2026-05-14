@@ -72,7 +72,7 @@ async function loadRamaisData() {
     const csvText = new TextDecoder("utf-8").decode(buffer);
     const rows = parseSemicolonCsv(csvText);
     const headerIndex = rows.findIndex((row) =>
-      row.some((cell) => normalizeText(cell).includes("nome")),
+      row.some((cell) => normalizeText(cell).includes("nome"))
     );
 
     if (headerIndex < 0) {
@@ -94,7 +94,11 @@ async function loadRamaisData() {
     ]);
     const idxRamal = findHeaderIndex(["ramal"]);
     const idxDdr = findHeaderIndex(["ddr"]);
-    const idxObservacao = findHeaderIndex(["observacao", "observaçao", "obs"]);
+    const idxObservacao = findHeaderIndex([
+      "observacao",
+      "observaçao",
+      "obs",
+    ]);
     const idxEmail = findHeaderIndex(["email", "e-mail"]);
 
     const getCell = (row, index, fallbackIndex = -1) => {
