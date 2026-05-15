@@ -129,7 +129,7 @@ function formatContact(name, phone, email) {
 function formatRoleLine(role, name, phone, email, ramal) {
   const details = [];
   if (phone) details.push(`Telefone: ${phone}`);
-  if (ramal) details.push(`Ramal: ${ramal}`);
+  if (ramal) details.push(`Ramais: ${ramal}`);
   if (email)
     details.push(
       `<a href="mailto:${email}" class="text-blue-600 hover:underline">${email}</a>`,
@@ -139,8 +139,15 @@ function formatRoleLine(role, name, phone, email, ramal) {
     return "";
   }
 
+  const roleIcon = {
+    "Diretor(a)": "fas fa-user-tie",
+    "Coordenador(a)": "fas fa-chalkboard-teacher",
+    "Supervisor(a)": "fas fa-user-shield",
+    "Suporte": "fas fa-headset",
+  }[role] || "fas fa-user";
+
   const detailsText = details.length ? ` - ${details.join(" / ")}` : "";
-  return `<p class="text-sm text-gray-700 mb-0"><strong>${role}:</strong> ${name || "-"}${detailsText}</p>`;
+  return `<p class="text-sm text-gray-700 mb-0"><i class="${roleIcon} text-gray-500 mr-2"></i><strong>${role}:</strong> ${name || "-"}${detailsText}</p>`;
 }
 
 function getFirstName(fullName) {
@@ -302,10 +309,10 @@ function displaySchools(schoolsToDisplay) {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
-          <p class="truncate mb-0"><strong>Endereço:</strong> ${school.address || "-"}${school.neighborhood ? `, ${school.neighborhood}` : ""}</p>
-          <p class="mb-0"><strong>Telefone:</strong> ${school.phones.join(" / ") || "-"}</p>
-          <p class="mb-0"><strong>Whatsapp:</strong> ${school.whatsapp || "-"}</p>
-          ${school.ramal.length ? `<p class="mb-0"><strong>Ramais:</strong> ${school.ramal.join(", ")}</p>` : ""}
+          <p class="truncate mb-0"><i class="fas fa-map-pin text-gray-500 mr-2"></i><strong>Endereço:</strong> ${school.address || "-"}${school.neighborhood ? `, ${school.neighborhood}` : ""}</p>
+          <p class="mb-0"><i class="fas fa-phone text-gray-500 mr-2"></i><strong>Telefone:</strong> ${school.phones.join(" / ") || "-"}</p>
+          <p class="mb-0"><i class="fab fa-whatsapp text-green-600 mr-2"></i><strong>Whatsapp:</strong> ${school.whatsapp || "-"}</p>
+          ${school.ramal.length ? `<p class="mb-0"><i class="fas fa-phone-square text-gray-500 mr-2"></i><strong>Ramais:</strong> ${school.ramal.join(", ")}</p>` : ""}
           ${formatRoleLine("Diretor(a)", school.director, school.directorPhone, school.directorEmail, "")}
           ${formatRoleLine("Coordenador(a)", school.coordinatorName, "", school.coordinatorEmail, school.coordinatorRamal)}
           ${formatRoleLine("Supervisor(a)", school.supervisorName, school.supervisorPhone, school.supervisorEmail, "")}
