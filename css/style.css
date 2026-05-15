@@ -52,3 +52,51 @@
   padding: 0.5rem;
   margin-bottom: 0.5rem;
 }
+
+.filter-pill {
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.filter-pill input[type="checkbox"] {
+  display: none;
+}
+
+.filter-pill span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-width: 72px;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4b5563;
+  background-color: #f8fafc;
+  border: 1px solid #e5e7eb;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .filter-pill span {
+    font-size: 0.7rem;
+    min-width: 64px;
+    padding: 0.3rem 0.65rem;
+  }
+}
+
+.filter-pill:hover span {
+  transform: translateY(-1px);
+}
+
+.filter-pill input[type="checkbox"]:checked + span {
+  background-color: var(--pill-color);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.filter-pill input[type="checkbox"]:not(:checked) + span {
+  opacity: 0.7;
+}

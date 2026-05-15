@@ -128,33 +128,19 @@ function formatContact(name, phone, email) {
 
 function formatRoleLine(role, name, phone, email, ramal) {
   const details = [];
-  if (phone) details.push(`<span class="inline-flex items-center"><i class="fas fa-phone mr-1 text-gray-600"></i>${phone}</span>`);
+  if (phone) details.push(`Telefone: ${phone}`);
+  if (ramal) details.push(`Ramal: ${ramal}`);
   if (email)
     details.push(
-      `<span class="inline-flex items-center"><i class="fas fa-envelope mr-1 text-gray-600"></i><a href="mailto:${email}" class="text-blue-600 hover:underline">${email}</a></span>`,
+      `<a href="mailto:${email}" class="text-blue-600 hover:underline">${email}</a>`,
     );
-  if (ramal)
-    details.push(
-      `<span class="inline-flex items-center"><i class="fas fa-phone mr-1 text-gray-600"></i>${ramal}</span>`,
-    );
-
-  const roleIcon = {
-    "Diretor(a)": "fas fa-user-tie",
-    "Coordenador(a)": "fas fa-chalkboard-teacher",
-    "Supervisor(a)": "fas fa-user-shield",
-    "Suporte": "fas fa-headset",
-  }[role] || "fas fa-user";
 
   if (!name && details.length === 0) {
-    return `<p class="text-sm text-gray-600 flex items-center gap-2"><i class="${roleIcon} text-gray-600"></i><span class="font-semibold">${role}:</span> -</p>`;
+    return "";
   }
 
-  const nameLine = `<p class="text-sm text-gray-700 flex items-center gap-2"><i class="${roleIcon} text-gray-600"></i><span class="font-semibold">${role}:</span> ${name || "-"}</p>`;
-  const detailsLine = details.length
-    ? `<p class="text-sm text-gray-600 ml-5 mt-1">${details.join(" - ")}</p>`
-    : "";
-
-  return `${nameLine}${detailsLine}`;
+  const detailsText = details.length ? ` - ${details.join(" / ")}` : "";
+  return `<p class="text-sm text-gray-700 mb-0"><strong>${role}:</strong> ${name || "-"}${detailsText}</p>`;
 }
 
 function getFirstName(fullName) {
@@ -303,42 +289,27 @@ function displaySchools(schoolsToDisplay) {
       "school-card bg-white rounded-lg shadow-md p-4 transition duration-300 border border-gray-100";
 
     card.innerHTML = `
-      <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
-        <div class="flex-1">
-          <div class="flex flex-wrap items-center gap-2 mb-2">
-            <span class="inline-block px-2 py-0.5 rounded-full text-sm font-medium text-white" style="background-color: ${schoolTypeColors[school.type] || "#1f2937"}">
-              ${school.type}
-            </span>
-            <h3 class="text-lg font-semibold text-gray-800">${school.name}</h3>
+      <div class="flex flex-col gap-3">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2 min-w-0">
+            <span class="inline-block px-2 py-0.5 rounded-full text-sm font-medium text-white" style="background-color: ${schoolTypeColors[school.type] || "#1f2937"}">${school.type}</span>
+            <h3 class="text-lg font-semibold text-gray-800 truncate">${school.name}</h3>
+            ${school.schoolEmail ? `<a href="mailto:${school.schoolEmail}" class="text-sm text-blue-600 hover:underline truncate">${school.schoolEmail}</a>` : ""}
           </div>
-          <p class="text-gray-700 text-sm flex items-center">
-            <i class="fas fa-map-pin mr-2"></i>${school.address || "-"}${school.neighborhood ? `, ${school.neighborhood}` : ""}
-          </p>
-          ${school.schoolEmail ? `<p class="text-sm mt-1"><i class="fas fa-envelope mr-2 text-gray-600"></i><a href="mailto:${school.schoolEmail}" class="text-blue-600 hover:underline">${school.schoolEmail}</a></p>` : ""}
-        </div>
-        <div class="flex gap-2">
-          <button class="map-btn px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition flex items-center text-sm">
-            <i class="fas fa-map-marker-alt mr-1"></i>Mapa
+          <button class="map-btn px-4 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition flex items-center text-sm">
+            <i class="fas fa-map-marker-alt mr-2"></i>Mapa
           </button>
         </div>
-      </div>
 
-      <div class="mt-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 text-sm">
-        <div class="bg-gray-50 rounded p-2 flex flex-col justify-center h-full">
-          <p class="font-semibold text-gray-700 mb-1 flex items-center gap-2">
-            <i class="fas fa-address-book text-gray-600"></i>Contatos da escola
-          </p>
-          <p class="flex items-center"><i class="fas fa-phone-square mr-1 text-gray-600"></i>${school.phones.join(" / ") || "-"}</p>
-          ${school.ramal.length ? `<p class="flex items-center mt-1"><i class="fas fa-phone-square mr-1 text-gray-600"></i>Ramais: ${school.ramal.join(", ")}</p>` : ""}
-          ${school.whatsapp ? `<p class="flex items-center mt-1"><i class="fab fa-whatsapp mr-1 text-green-600"></i>${school.whatsapp}</p>` : ""}
-        </div>
-        <div class="bg-gray-50 rounded p-2 flex flex-col justify-center h-full">
-          ${formatRoleLine("Diretor(a)", getFirstName(school.director), school.directorPhone, school.directorEmail, "")}
-          ${formatRoleLine("Coordenador(a)", getFirstName(school.coordinatorName), "", school.coordinatorEmail, school.coordinatorRamal)}
-        </div>
-        <div class="bg-gray-50 rounded p-2 flex flex-col justify-center h-full">
-          ${formatRoleLine("Supervisor(a)", getFirstName(school.supervisorName), school.supervisorPhone, school.supervisorEmail, "")}
-          ${formatRoleLine("Suporte", getFirstName(school.supportName), school.supportPhone, school.supportEmail, school.supportRamal)}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
+          <p class="truncate mb-0"><strong>Endereço:</strong> ${school.address || "-"}${school.neighborhood ? `, ${school.neighborhood}` : ""}</p>
+          <p class="mb-0"><strong>Telefone:</strong> ${school.phones.join(" / ") || "-"}</p>
+          <p class="mb-0"><strong>Whatsapp:</strong> ${school.whatsapp || "-"}</p>
+          ${school.ramal.length ? `<p class="mb-0"><strong>Ramais:</strong> ${school.ramal.join(", ")}</p>` : ""}
+          ${formatRoleLine("Diretor(a)", school.director, school.directorPhone, school.directorEmail, "")}
+          ${formatRoleLine("Coordenador(a)", school.coordinatorName, "", school.coordinatorEmail, school.coordinatorRamal)}
+          ${formatRoleLine("Supervisor(a)", school.supervisorName, school.supervisorPhone, school.supervisorEmail, "")}
+          ${formatRoleLine("Suporte", school.supportName, school.supportPhone, school.supportEmail, school.supportRamal)}
         </div>
       </div>
     `;
