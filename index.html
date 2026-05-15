@@ -10,17 +10,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/style.css">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <style>
-    .custom-div-icon {
-      background: none;
-      border: none;
-    }
-
-    .custom-div-icon div {
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-  </style>
 </head>
 
 <body class="bg-gray-50 min-h-screen">
@@ -33,7 +22,7 @@
         </div>
         <nav aria-label="Busca e menu" class="flex flex-col md:flex-row items-center w-full md:w-auto">
           <div class="relative w-full md:w-96">
-            <input type="text" id="searchInput" placeholder="Buscar por nome, bairro ou tipo..." class="w-full px-4 py-2 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <input type="text" id="searchInput" placeholder="Buscar por escola, bairro, diretor(a) ou equipe..." class="w-full px-4 py-2 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400">
             <button id="searchBtn" class="absolute right-0 top-0 h-full px-4 text-blue-600 rounded-r-full bg-white hover:bg-gray-100">
               <i class="fas fa-search"></i>
             </button>
@@ -48,10 +37,11 @@
               <span class="block w-6 h-0.5 bg-white"></span>
             </button>
             <div id="menuDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded shadow-lg z-50">
+              <a href="escolas.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Escolas</a>
+              <a href="ramais.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Ramais</a>
               <a href="calendarioemef.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário EMEF</a>
               <a href="calendarioemei.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário EMEI</a>
               <a href="calendariomaternal.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário Maternal</a>
-              <a href="calendarioeja.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-100">Calendário EJA</a>
             </div>
           </div>
         </nav>
@@ -60,76 +50,67 @@
   </header>
 
   <main class="container mx-auto px-4 py-8 main-content">
-    <div class="flex flex-col lg:flex-row gap-8">
-      <section class="w-full lg:w-1/4 bg-white p-6 rounded-lg shadow-md" aria-label="Filtros">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">Filtros</h2>
-
-        <div class="mb-6">
-          <h3 class="font-medium text-gray-700 mb-2">Tipo de Escola</h3>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="checkbox" class="filter-checkbox" value="EMEF" checked>
-              <span class="ml-2 text-gray-700">EMEF</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="filter-checkbox" value="EMEI" checked>
-              <span class="ml-2 text-gray-700">EMEI</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="filter-checkbox" value="EMEIEF" checked>
-              <span class="ml-2 text-gray-700">EMEIEF</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="filter-checkbox" value="EMM" checked>
-              <span class="ml-2 text-gray-700">EMM</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="filter-checkbox" value="EMMEI" checked>
-              <span class="ml-2 text-gray-700">EMMEI</span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="filter-checkbox" value="OS" checked>
-              <span class="ml-2 text-gray-700">OS </span>
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" class="filter-checkbox" value="CRI" checked>
-              <span class="ml-2 text-gray-700">CRI</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="mb-6">
-          <h3 class="font-medium text-gray-700 mb-2">Bairro</h3>
-          <select id="neighborhoodFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+      <div class="flex flex-col lg:flex-row lg:items-center gap-4">
+        <div class="w-full lg:w-[220px] min-w-0">
+          <label for="neighborhoodFilter" class="block text-sm font-medium text-gray-700 mb-2">Bairro</label>
+          <select id="neighborhoodFilter" class="w-full px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm">
             <option value="">Todos os bairros</option>
           </select>
         </div>
-
-        <button id="resetFilters" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md transition">
-          Limpar Filtros
-        </button>
-      </section>
-
-      <section class="w-full lg:w-3/4" aria-label="Resultados">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-semibold text-gray-800">Escolas Encontradas</h2>
-          <div class="text-gray-600">
-            <span id="resultCount">4</span> resultados
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-gray-700 mb-2">Tipo de escola</p>
+          <div class="flex flex-wrap gap-2 items-center overflow-x-auto py-1 min-w-0">
+            <label class="filter-pill" style="--pill-color:#5072e4">
+              <input type="checkbox" class="filter-checkbox" value="EMEF" checked>
+              <span><i class="fas fa-school"></i>EMEF</span>
+            </label>
+            <label class="filter-pill" style="--pill-color:#e958a0">
+              <input type="checkbox" class="filter-checkbox" value="EMEI" checked>
+              <span><i class="fas fa-child"></i>EMEI</span>
+            </label>
+            <label class="filter-pill" style="--pill-color:#f19f40">
+              <input type="checkbox" class="filter-checkbox" value="EMEIEF" checked>
+              <span><i class="fas fa-book-open"></i>EMEIEF</span>
+            </label>
+            <label class="filter-pill" style="--pill-color:#935ef0">
+              <input type="checkbox" class="filter-checkbox" value="EMM" checked>
+              <span><i class="fas fa-flask"></i>EMM</span>
+            </label>
+            <label class="filter-pill" style="--pill-color:#ec5050">
+              <input type="checkbox" class="filter-checkbox" value="EMMEI" checked>
+              <span><i class="fas fa-user-graduate"></i>EMMEI</span>
+            </label>
+            <label class="filter-pill" style="--pill-color:#9da3af">
+              <input type="checkbox" class="filter-checkbox" value="OS" checked>
+              <span><i class="fas fa-building"></i>OS</span>
+            </label>
+            <label class="filter-pill" style="--pill-color:#111827">
+              <input type="checkbox" class="filter-checkbox" value="CRI" checked>
+              <span><i class="fas fa-baby"></i>CRI</span>
+            </label>
+            <label class="filter-pill" style="--pill-color:#06b6d4">
+              <input type="checkbox" class="filter-checkbox" value="INTEGRAL" checked>
+              <span><i class="fas fa-star"></i>INTEGRAL</span>
+            </label>
           </div>
         </div>
-
-        <div id="schoolsContainer" class="space-y-4">
-          <!-- School cards will be dynamically inserted here -->
-        </div>
-
-        <section class="mt-8" aria-label="Mapa das Escolas">
-          <h2 class="text-xl font-semibold text-gray-800 mb-4">Localização das Escolas</h2>
-          <div id="map" class="map-container bg-gray-200 flex items-center justify-center" style="height: 400px; width: 100%;">
-            <p class="text-gray-500">Carregando mapa...</p>
-          </div>
-        </section>
-      </section>
+        <button id="resetFilters" type="button" class="w-full lg:w-auto self-start lg:self-auto h-10 px-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md transition text-sm">Limpar Filtros</button>
+      </div>
     </div>
+
+    <section class="w-full" aria-label="Resultados">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-6 gap-4">
+        <h2 class="text-xl font-semibold text-gray-800">Escolas e Equipes de Referência</h2>
+        <div class="text-gray-600">
+          <span id="resultCount">4</span> resultados
+        </div>
+      </div>
+
+      <div id="schoolsContainer" class="space-y-4">
+        <!-- School cards will be dynamically inserted here -->
+      </div>
+    </section>
   </main>
 
   <footer class="bg-gray-800 text-white py-8">
@@ -161,9 +142,7 @@
     </div>
   </footer>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/escolas.js"></script>
   <script src="js/script.js"></script>
   <script>
     // Menu hambúrguer toggle
