@@ -3,15 +3,6 @@ const schoolsData = [];
 let currentlyDisplayedSchools = [];
 let schoolsDataPromise = null;
 
-const integralSchools = [
-  "EMEF Ezio Berzaghi",
-  "EMEF Renato Rosa",
-  "EMEF Nestor de Camargo",
-  "EMEIEF Eneias Raimundo da Silva",
-  "EMEF Carlos Osmarinho",
-  "EMEF Egídio Costa",
-];
-
 const schoolTypeColors = {
   EMEF: "#5072e4",
   EMEI: "#e958a0",
@@ -147,11 +138,18 @@ function formatRoleLine(role, name, phone, email, ramal) {
       `<span class="inline-flex items-center"><i class="fas fa-phone mr-1 text-gray-600"></i>${ramal}</span>`,
     );
 
+  const roleIcon = {
+    "Diretor(a)": "fas fa-user-tie",
+    "Coordenador(a)": "fas fa-chalkboard-teacher",
+    "Supervisor(a)": "fas fa-user-shield",
+    "Suporte": "fas fa-headset",
+  }[role] || "fas fa-user";
+
   if (!name && details.length === 0) {
-    return `<p class="text-sm text-gray-600"><span class="font-semibold">${role}:</span> -</p>`;
+    return `<p class="text-sm text-gray-600 flex items-center gap-2"><i class="${roleIcon} text-gray-600"></i><span class="font-semibold">${role}:</span> -</p>`;
   }
 
-  const nameLine = `<p class="text-sm text-gray-700"><span class="font-semibold">${role}:</span> ${name || "-"}</p>`;
+  const nameLine = `<p class="text-sm text-gray-700 flex items-center gap-2"><i class="${roleIcon} text-gray-600"></i><span class="font-semibold">${role}:</span> ${name || "-"}</p>`;
   const detailsLine = details.length
     ? `<p class="text-sm text-gray-600 ml-5 mt-1">${details.join(" - ")}</p>`
     : "";
@@ -232,6 +230,7 @@ async function loadSchoolsData() {
           supportPhone: row[18] || "",
           supportRamal: row[19] || "",
           supportEmail: row[20] || "",
+          integral: String(row[21] || "N").trim().toUpperCase(),
         };
 
         school.ramal = [
@@ -334,16 +333,10 @@ function displaySchools(schoolsToDisplay) {
           ${school.whatsapp ? `<p class="flex items-center mt-1"><i class="fab fa-whatsapp mr-1 text-green-600"></i>${school.whatsapp}</p>` : ""}
         </div>
         <div class="bg-gray-50 rounded p-2 flex flex-col justify-center h-full">
-          <p class="font-semibold text-gray-700 mb-1 flex items-center gap-2">
-            <i class="fas fa-user-tie text-gray-600"></i>
-          </p>
           ${formatRoleLine("Diretor(a)", getFirstName(school.director), school.directorPhone, school.directorEmail, "")}
           ${formatRoleLine("Coordenador(a)", getFirstName(school.coordinatorName), "", school.coordinatorEmail, school.coordinatorRamal)}
         </div>
         <div class="bg-gray-50 rounded p-2 flex flex-col justify-center h-full">
-          <p class="font-semibold text-gray-700 mb-1 flex items-center gap-2">
-            <i class="fas fa-headset text-gray-600"></i>
-          </p>
           ${formatRoleLine("Supervisor(a)", getFirstName(school.supervisorName), school.supervisorPhone, school.supervisorEmail, "")}
           ${formatRoleLine("Suporte", getFirstName(school.supportName), school.supportPhone, school.supportEmail, school.supportRamal)}
         </div>
@@ -360,21 +353,15 @@ function filterSchools() {
     .filter((checkbox) => checkbox.checked)
     .map((checkbox) => checkbox.value);
   const selectedNeighborhood = neighborhoodFilter.value;
-
-  const isIntegralSelected = selectedTypes.includes("INTEGRAL");
+  const includeIntegral = selectedTypes.includes("INTEGRAL");
+  const selectedTypesWithoutIntegral = selectedTypes.filter((type) => type !== "INTEGRAL");
 
   const filteredSchools = schoolsData
     .filter((school) => {
-      // Handle INTEGRAL filter
-      if (isIntegralSelected) {
-        const schoolNameNormalized = normalizeText(school.name).toLowerCase();
-        const isIntegralSchool = integralSchools.some((integralName) => {
-          const integralNameNormalized = normalizeText(integralName).toLowerCase();
-          return schoolNameNormalized.includes(integralNameNormalized.split(" ")[0]) && 
-                 schoolNameNormalized.includes(integralNameNormalized.split(" ").pop());
-        });
-        if (!isIntegralSchool) return false;
-      } else if (!selectedTypes.includes(school.type)) {
+      const matchesType = selectedTypesWithoutIntegral.includes(school.type);
+      const matchesIntegral = includeIntegral && school.integral === "S";
+
+      if (!matchesType && !matchesIntegral) {
         return false;
       }
 

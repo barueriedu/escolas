@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+import unicodedata
 
 # Carregar o arquivo (tentando encodings comuns)
 encodings_tentados = ['utf-8', 'utf-8-sig', 'cp1252', 'latin1']
@@ -49,6 +50,29 @@ def extrair_dados_corrigido(linha):
             
     return tels_final, rams_final
 
+def normalize_text(value):
+    if pd.isna(value):
+        return ""
+    text = str(value).strip().lower()
+    text = unicodedata.normalize('NFD', text)
+    text = re.sub(r'[\u0300-\u036f]', '', text)
+    text = re.sub(r'[^a-z0-9 ]', ' ', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
+
+integral_schools = {
+    normalize_text('EMEF Ézio Berzaghi'),
+    normalize_text('EMEF Renato Rosa'),
+    normalize_text('EMEF Nestor de Camargo'),
+    normalize_text('EMEIEF Eneias Raimundo da Silva'),
+    normalize_text('EMEF Carlos Osmarinho'),
+    normalize_text('EMEF Egídio Costa'),
+}
+
+def flag_integral(escola):
+    escola_normalizada = normalize_text(escola)
+    return 'S' if any(nome in escola_normalizada for nome in integral_schools) else 'N'
+
 # Aplicar a lógica criando as novas colunas
 df[['Telefones', 'Ramais']] = df.apply(lambda x: pd.Series(extrair_dados_corrigido(x)), axis=1)
 
@@ -69,6 +93,12 @@ df_final = df[colunas]
 
 # Remover qualquer coluna duplicada mantendo a primeira ocorrência
 df_final = df_final.loc[:, ~df_final.columns.duplicated(keep='first')]
+
+# Adicionar flag Integral para filtro na aplicação
+if 'ESCOLA' in df_final.columns:
+    df_final['Integral'] = df_final['ESCOLA'].apply(flag_integral)
+else:
+    df_final['Integral'] = 'N'
 
 # Salvar o resultado
 df_final.to_csv('escolasatualizadas_novo.csv', index=False, sep=';', encoding='utf-8-sig')
