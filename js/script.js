@@ -3,6 +3,15 @@ const schoolsData = [];
 let currentlyDisplayedSchools = [];
 let schoolsDataPromise = null;
 
+const integralSchools = [
+  "EMEF Ezio Berzaghi",
+  "EMEF Renato Rosa",
+  "EMEF Nestor de Camargo",
+  "EMEIEF Eneias Raimundo da Silva",
+  "EMEF Carlos Osmarinho",
+  "EMEF Egídio Costa",
+];
+
 const schoolTypeColors = {
   EMEF: "#5072e4",
   EMEI: "#e958a0",
@@ -11,6 +20,7 @@ const schoolTypeColors = {
   EMEIEF: "#f19f40",
   OS: "#9da3af",
   CRI: "#111827",
+  INTEGRAL: "#06b6d4",
 };
 
 const schoolsContainer = document.getElementById("schoolsContainer");
@@ -351,9 +361,23 @@ function filterSchools() {
     .map((checkbox) => checkbox.value);
   const selectedNeighborhood = neighborhoodFilter.value;
 
+  const isIntegralSelected = selectedTypes.includes("INTEGRAL");
+
   const filteredSchools = schoolsData
     .filter((school) => {
-      if (!selectedTypes.includes(school.type)) return false;
+      // Handle INTEGRAL filter
+      if (isIntegralSelected) {
+        const schoolNameNormalized = normalizeText(school.name).toLowerCase();
+        const isIntegralSchool = integralSchools.some((integralName) => {
+          const integralNameNormalized = normalizeText(integralName).toLowerCase();
+          return schoolNameNormalized.includes(integralNameNormalized.split(" ")[0]) && 
+                 schoolNameNormalized.includes(integralNameNormalized.split(" ").pop());
+        });
+        if (!isIntegralSchool) return false;
+      } else if (!selectedTypes.includes(school.type)) {
+        return false;
+      }
+
       if (selectedNeighborhood && school.neighborhood !== selectedNeighborhood)
         return false;
 
